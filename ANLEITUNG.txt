@@ -1,0 +1,16 @@
+SATZBUCH – OFFLINE-APP EINRICHTEN
+
+1. Kostenloses Konto auf github.com anlegen (falls noch keins vorhanden).
+2. Neues Repository anlegen: Name "satzbuch", Sichtbarkeit "Public".
+3. Im Repository auf "uploading an existing file" tippen und alle Dateien
+   aus diesem Ordner hochladen (index.html, sw.js, manifest.webmanifest,
+   alle icon-*.png). Unten "Commit changes".
+4. Settings > Pages > Branch "main", Ordner "/ (root)" > Save.
+   Nach 1–2 Minuten ist die App erreichbar unter:
+   https://DEIN-NAME.github.io/satzbuch/
+5. Diese Adresse am Handy in Chrome öffnen, Menü (⋮) > "App installieren"
+   bzw. "Zum Startbildschirm hinzufügen".
+6. Einmal mit Internet öffnen, danach startet sie auch offline.
+
+Daten: Alles liegt nur auf dem Handy. Im Verlauf unten "Sicherung herunterladen"
+nutzen, um eine Sicherungsdatei zu erstellen.
