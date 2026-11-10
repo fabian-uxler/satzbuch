@@ -52,8 +52,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .list .row:first-child{border-top:0}
 .row{border-top:1px solid var(--line);scroll-margin-top:150px}
 .row.open{background:var(--surface)}
-.rowbtn{width:100%;min-height:64px;display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 16px;border:0;background:transparent;text-align:left;cursor:pointer}
-.num{width:22px;height:22px;display:flex;align-items:center;justify-content:center;font:600 15px var(--display);color:var(--faint);font-variant-numeric:tabular-nums}
+.rowbtn{width:100%;min-height:64px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:12px 16px;border:0;background:transparent;text-align:left;cursor:pointer}
+.num{width:16px;height:22px;display:flex;align-items:center;justify-content:flex-start;font:600 15px var(--display);color:var(--faint);font-variant-numeric:tabular-nums}
 .num .dot{width:22px;height:22px}
 .num .dot svg{width:14px;height:14px}
 .names{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -131,10 +131,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .ibtn[aria-pressed="true"]{background:var(--fg);color:#fff}
 .ibtn.danger{border-color:var(--down);color:var(--down)}
 .addset{height:44px;width:100%}
-.sep{display:inline-block;width:2px;height:.7em;background:var(--faint);margin:0 .32em;vertical-align:.04em;border-radius:1px}
+.sep{display:inline-block;width:2px;height:.7em;background:var(--faint);margin:0 .26em;vertical-align:.04em;border-radius:1px}
+@media (max-width:359px){.vals.many .kg,.vals.many .reps{font-size:20px}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .rm.up{color:var(--up)}.rm.down{color:var(--down)}
-.vals.many .kg,.vals.many .reps{font-size:20px}
 .done{height:48px;border:0;border-radius:10px;background:var(--fg);color:#fff;font:700 18px var(--display);letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
 .extra{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 16px}
 .extra .danger{color:var(--down)}
@@ -149,7 +149,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .outline svg{width:16px;height:16px;flex:none}
 .outline:active{background:var(--surface)}
 .sorthint{margin:0;padding:12px 16px;font-size:13px;color:var(--muted)}
-.sortrow .rowbtn{grid-template-columns:22px minmax(0,1fr) 44px;cursor:default}
+.sortrow .rowbtn{grid-template-columns:auto minmax(0,1fr) 44px;cursor:default}
 .grip{width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:var(--fg);display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;padding:0}
 .grip svg{width:22px;height:22px}
 .grip:active{cursor:grabbing;background:var(--line)}
@@ -349,8 +349,8 @@ function valsHTML(e) {
 const valsCls = (e) => "vals" + (e.reps.length > 3 ? " many" : "");
 function day() { return plan[ui.day]; }
 function devLabel(e) { return e.devs && e.devs.length > 1 ? (e.devs[e.ai || 0].label || "Variante " + ((e.ai || 0) + 1)) : ""; }
-function subLine(e) { return e.m || "Muskelgruppe"; }
-function titleLine(e) { const dl = devLabel(e); return (e.n || "Neue Übung") + (dl ? " (" + dl + ")" : ""); }
+function subLine(e) { return devLabel(e) || e.m || "Muskelgruppe"; }
+function titleLine(e) { return e.n || "Neue Übung"; }
 function storeDev(e) { if (e.devs) { const i = e.ai || 0; e.devs[i] = { label: e.devs[i].label, kg: e.kg, reps: e.reps.slice(), sw: e.sw.slice(), marks: setMarks(e), step: e.step || 2.5, mark: sumMark(setMarks(e)) }; } }
 function loadDev(e, i) { storeDev(e); const d = e.devs[i]; e.ai = i; e.kg = d.kg || ""; normEx(d); normSw(d); e.reps = d.reps.slice(); e.sw = d.sw.slice(); e.marks = d.marks.slice(); e.step = d.step || 2.5; e.mark = sumMark(e.marks); }
 const fmtKg = (n) => (Math.round(n * 100) / 100).toLocaleString("de-DE", { maximumFractionDigits: 2 });
@@ -402,14 +402,14 @@ const GRIP = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 7.5h10M5 1
 function rowHTML(e, i) {
   if (ui.reorder) {
     return '<div class="row sortrow" data-id="' + e.id + '"><div class="rowbtn">' +
-      '<span class="num">' + (sumMark(marksOf(e)) ? markDot(sumMark(marksOf(e)), true) : i + 1) + "</span>" +
+      '<span class="num">' + (i + 1) + "</span>" +
       '<span class="names"><b>' + esc(titleLine(e)) + "</b><span>" + esc(subLine(e)) + "</span></span>" +
       '<button class="grip" type="button" aria-label="' + esc(e.n || "Übung") + ' verschieben (Pfeiltasten hoch und runter)">' + GRIP + "</button></div></div>";
   }
   const open = ui.open === e.id;
   let h = '<div class="row' + (open ? " open" : "") + '" data-id="' + e.id + '">' +
     '<button class="rowbtn" type="button" data-act="toggle" aria-expanded="' + open + '">' +
-    '<span class="num">' + (sumMark(marksOf(e)) ? markDot(sumMark(marksOf(e)), true) : i + 1) + "</span>" +
+    '<span class="num">' + (i + 1) + "</span>" +
     '<span class="names"><b>' + esc(titleLine(e)) + "</b><span>" + esc(subLine(e)) + "</span></span>" +
     '<span class="' + valsCls(e) + '" data-vals>' + valsHTML(e) + "</span></button>";
   if (open) {
@@ -472,7 +472,7 @@ function renderHist() {
     const s = sessions[id], open = ui.histOpen === id;
     let h = '<div class="sess"><button class="sessbtn" type="button" data-hact="open" data-sid="' + id + '" aria-expanded="' + open + '"><b>' + esc(s.title) + "</b><span>" + dlabel(s.date) + "</span></button>";
     if (open) {
-      h += '<div class="sessbody">' + s.ex.map((e, i) => '<div class="sline"><span class="num" style="width:18px;height:18px">' + (sumMark(marksOf(e)) ? markDot(sumMark(marksOf(e)), true) : i + 1) + '</span><span class="n">' + esc(e.n) + (e.dl ? " (" + esc(e.dl) + ")" : "") + '</span><span class="v">' + (e.kg ? esc(e.kg) + " kg \u2003" : "") + repsHTML(e.reps, marksOf(e)) + "</span></div>").join("");
+      h += '<div class="sessbody">' + s.ex.map((e, i) => '<div class="sline"><span class="num" style="width:18px;height:18px">' + (i + 1) + '</span><span class="n">' + esc(e.n) + (e.dl ? " (" + esc(e.dl) + ")" : "") + '</span><span class="v">' + (e.kg ? esc(e.kg) + " kg \u2003" : "") + repsHTML(e.reps, marksOf(e)) + "</span></div>").join("");
       h += ui.histDel === id
         ? '<div class="confirm" style="margin-top:10px"><span>Training löschen?</span><div><button class="smallbtn" type="button" data-hact="cancel" data-sid="' + id + '">Abbrechen</button><button class="smallbtn red" type="button" data-hact="del" data-sid="' + id + '">Löschen</button></div></div>'
         : '<div class="extra" style="margin-top:6px"><span></span><button class="linkbtn danger" type="button" data-hact="ask" data-sid="' + id + '">Training löschen</button></div>';
@@ -594,8 +594,7 @@ function updSets(row, e) {
     const j = +sr.dataset.j, a = sr.querySelector("[data-arr]"), w = sr.querySelector('input[data-f^="w"]');
     if (a) a.innerHTML = markDot(sm[j], true); if (w) w.placeholder = e.kg || "kg";
   });
-  const num = row.querySelector(".rowbtn .num"), s = sumMark(sm);
-  if (num) num.innerHTML = s ? markDot(s, true) : String(day().ex.indexOf(e) + 1);
+
 }
 $("list").addEventListener("input", (ev) => {
   const inp = ev.target, f = inp.dataset.f; if (!f) return;
