@@ -371,6 +371,9 @@ body{letter-spacing:-.01em}
 .outline{background:var(--fg);color:#111}
 .outline:active{background:#dcdbd6}
 .week button.today{box-shadow:none}
+#footNote{display:none!important}
+.listactions{padding:12px 0 0}
+.names span.dv{font-weight:600;color:var(--ink2)}
 </style>
 </head>
 <body>
@@ -579,14 +582,14 @@ function rowHTML(e, i) {
   if (ui.reorder) {
     return '<div class="row sortrow' + (e.paused ? " paused" : "") + '" data-id="' + e.id + '"><div class="rowbtn">' +
       '<span class="num">' + (i + 1) + "</span>" +
-      '<span class="names"><b>' + esc(titleLine(e)) + "</b><span>" + esc(subLine(e)) + "</span></span>" +
+      '<span class="names"><b>' + esc(titleLine(e)) + "</b><span" + (devLabel(e) ? ' class="dv"' : "") + ">" + esc(subLine(e)) + "</span></span>" +
       '<button class="grip" type="button" aria-label="' + esc(e.n || "Übung") + ' verschieben (Pfeiltasten hoch und runter)">' + GRIP + "</button></div></div>";
   }
   const open = ui.open === e.id;
   let h = '<div class="row' + (open ? " open" : "") + (e.paused ? " paused" : "") + '" data-id="' + e.id + '">' +
     '<button class="rowbtn" type="button" data-act="toggle" aria-expanded="' + open + '">' +
     '<span class="num">' + (i + 1) + "</span>" +
-    '<span class="names"><b>' + esc(titleLine(e)) + "</b><span>" + esc(subLine(e)) + "</span></span>" +
+    '<span class="names"><b>' + esc(titleLine(e)) + "</b><span" + (devLabel(e) ? ' class="dv"' : "") + ">" + esc(subLine(e)) + "</span></span>" +
     '<span class="' + valsCls(e) + '" data-vals>' + valsHTML(e) + "</span></button>";
   if (open) {
     h += '<div class="panel">';
