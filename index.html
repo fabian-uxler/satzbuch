@@ -60,7 +60,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .names b,.names span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .names b{font-weight:600;font-size:15px;line-height:1.25}
 .names span{font-size:12px;color:var(--muted);line-height:1.3}
-.vals{display:flex;align-items:baseline;gap:10px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.vals{display:flex;align-items:baseline;gap:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
 .vals .kg{font:700 26px var(--display);line-height:1}
 .vals .kg small{font:600 14px var(--display);color:var(--muted);margin-left:2px}
 .vals .reps{font:600 26px var(--display);line-height:1;color:var(--ink2);letter-spacing:.01em}
@@ -110,7 +110,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .sets{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:14px}
 .setrow{display:flex;align-items:center;gap:8px}
 .swb{flex:1;min-width:0;display:flex;align-items:center;gap:6px}
-.swb .num-in{flex:1;min-width:0;font-size:18px}
+.swb .num-in{flex:1;min-width:0;max-width:76px;font-size:18px}
 .swb .num-in::placeholder{color:var(--faint);opacity:1}
 .swb .arr{width:20px;height:20px;flex:none;display:flex;align-items:center;justify-content:center}
 .swb .arr .dot{width:20px;height:20px}.swb .arr .dot svg{width:12px;height:12px}
@@ -118,7 +118,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .panel .pm{width:44px}
 .steps>.srow{flex-wrap:wrap;row-gap:8px}
 .steps>.srow .ctl{margin-left:auto}
-@media (max-width:359px){.panel .ctl{grid-template-columns:40px 60px 40px}.panel .pm{width:40px}}
+@media (max-width:359px){.swb .num-in{max-width:60px}.panel .ctl{grid-template-columns:40px 60px 40px}.panel .pm{width:40px}}
 .seg button{padding:0 9px}
 .xbtn{flex:none;color:var(--fg)}
 .xbtn svg{width:16px;height:16px}
@@ -344,7 +344,7 @@ function repsHTML(reps, marks) {
 }
 function valsHTML(e) {
   const kg = e.kg ? '<span class="kg">' + esc(e.kg) + "<small>kg</small></span>" : "";
-  return kg + '<span class="reps">' + repsHTML(e.reps, marksOf(e)) + "</span>";
+  return '<span class="reps">' + repsHTML(e.reps, marksOf(e)) + "</span>" + kg;
 }
 const valsCls = (e) => "vals" + (e.reps.length > 3 ? " many" : "");
 function day() { return plan[ui.day]; }
