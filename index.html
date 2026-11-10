@@ -359,6 +359,12 @@ body{letter-spacing:-.01em}
 .ibtn{background:var(--fg);color:var(--dark);border:0}
 .ibtn.danger{background:var(--fg);color:var(--accent)}
 .ibtn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+/* Highlight: Lila in der Übersicht, Gelb in der geöffneten Übung; Senken wieder Rot */
+:root{--accent:#8a86ff;--accent-ink:#ffffff;--dec:#f25c4a}
+.panel{--accent:#f7c84a;--accent-ink:#1c1c1e}
+.save{box-shadow:0 8px 20px -8px rgba(138,134,255,.65)}
+.ibtn.danger{color:#f25c4a}
+.devs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 </style>
 </head>
 <body>
