@@ -1,5 +1,5 @@
 // Satzbuch offline cache. Bump VERSION when files change.
-const VERSION = "satzbuch-v29";
+const VERSION = "satzbuch-v30";
 const CORE = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "icon-180.png"];
 const FONTS = "satzbuch-fonts";
 
