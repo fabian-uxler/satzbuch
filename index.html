@@ -118,12 +118,18 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .panel .pm{width:44px}
 .steps>.srow{flex-wrap:wrap;row-gap:8px}
 .steps>.srow .ctl{margin-left:auto}
-@media (max-width:359px){.panel .ctl{grid-template-columns:40px 60px 40px}.panel .pm{width:40px}.xbtn{width:32px}}
+@media (max-width:359px){.panel .ctl{grid-template-columns:40px 60px 40px}.panel .pm{width:40px}}
 .seg button{padding:0 9px}
-.xbtn{width:40px;height:48px;flex:none;border:0;border-radius:10px;background:transparent;color:var(--down);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
-.xbtn svg{width:18px;height:18px}
-.xbtn:active{background:var(--down-tint)}
-.xbtn:disabled{opacity:.3;cursor:default}
+.xbtn{flex:none;color:var(--fg)}
+.xbtn svg{width:16px;height:16px}
+.xbtn:disabled{opacity:.35;cursor:default}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
+.donerow{display:flex;gap:8px}.donerow .done{flex:1;min-width:0}
+.ibtn{width:48px;height:48px;flex:none;border:1.5px solid var(--fg);border-radius:10px;background:transparent;color:var(--fg);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.ibtn svg{width:22px;height:22px}
+.ibtn:active{background:var(--bg)}
+.ibtn[aria-pressed="true"]{background:var(--fg);color:#fff}
+.ibtn.danger{border-color:var(--down);color:var(--down)}
 .addset{height:44px;width:100%}
 .rm{display:inline-flex;align-items:center;gap:2px}
 .rm .dot{width:14px;height:14px;align-self:center}.rm .dot svg{width:9px;height:9px}
@@ -431,10 +437,10 @@ function rowHTML(e, i) {
     const sm = setMarks(e);
     e.reps.forEach((r, j) => {
       const n = j + 1;
-      h += '<div class="setrow" data-j="' + j + '"><div class="swb"><input class="num-in" id="w' + j + "-" + e.id + '" data-f="w' + j + '" inputmode="decimal" value="' + esc(e.sw[j]) + '" placeholder="' + esc(e.kg || "kg") + '" autocomplete="off" aria-label="Satz ' + n + ' Gewicht in kg (leer = allgemeines Gewicht)">' +
+      h += '<div class="setrow" data-j="' + j + '">' + '<button class="pm xbtn" type="button" data-act="rmset" data-j="' + j + '" aria-label="Satz ' + n + ' entfernen"' + (e.reps.length < 2 ? " disabled" : "") + '><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>' + '<div class="swb"><input class="num-in" id="w' + j + "-" + e.id + '" data-f="w' + j + '" inputmode="decimal" value="' + esc(e.sw[j]) + '" placeholder="' + esc(e.kg || "kg") + '" autocomplete="off" aria-label="Satz ' + n + ' Gewicht in kg (leer = allgemeines Gewicht)">' +
         '<span class="arr" data-arr>' + markDot(sm[j], true) + "</span></div>" +
         '<div class="ctl"><button class="pm" type="button" data-act="dec" data-f="r' + j + '" aria-label="Satz ' + n + ' eine Wiederholung weniger">−</button><input class="num-in" id="r' + j + "-" + e.id + '" data-f="r' + j + '" inputmode="numeric" value="' + esc(r) + '" placeholder="–" autocomplete="off" aria-label="Satz ' + n + ' Wiederholungen"><button class="pm" type="button" data-act="inc" data-f="r' + j + '" aria-label="Satz ' + n + ' eine Wiederholung mehr">+</button></div>' +
-        '<button class="xbtn" type="button" data-act="rmset" data-j="' + j + '" aria-label="Satz ' + n + ' entfernen"' + (e.reps.length < 2 ? " disabled" : "") + '><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>';
+        '</div>';
     });
     h += '<button class="smallbtn addset" type="button" data-act="addset">+ Satz hinzufügen</button>';
     h += "</div>";
@@ -442,9 +448,9 @@ function rowHTML(e, i) {
       h += '<div class="confirm"><span>Übung aus ' + esc(day().title) + " entfernen?</span><div>" +
         '<button class="smallbtn" type="button" data-act="cancelDel">Abbrechen</button><button class="smallbtn red" type="button" data-act="del">Entfernen</button></div></div>';
     }
-    h += '<button class="done" type="button" data-act="toggle">Fertig</button>' +
-      '<div class="tools"><button class="obtn" type="button" data-act="rename" aria-pressed="' + (ui.editName === e.id) + '">Bearbeiten</button>' +
-      '<button class="obtn danger" type="button" data-act="askDel">Übung löschen</button></div></div>';
+    h += '<div class="donerow"><button class="done" type="button" data-act="toggle">Fertig</button>' +
+      '<button class="ibtn" type="button" data-act="rename" aria-pressed="' + (ui.editName === e.id) + '" aria-label="Übung bearbeiten"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></button>' +
+      '<button class="ibtn danger" type="button" data-act="askDel" aria-label="Übung löschen"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M10 3h4M6 7l1 13h10l1-13M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></button></div></div>';
   }
   return h + "</div>";
 }
