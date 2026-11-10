@@ -50,7 +50,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .dot svg{width:12px;height:12px}
 .list{border-bottom:1px solid var(--line)}
 .list .row:first-child{border-top:0}
-.row{border-top:1px solid var(--line)}
+.row{border-top:1px solid var(--line);scroll-margin-top:150px}
 .row.open{background:var(--surface)}
 .rowbtn{width:100%;min-height:64px;display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 16px;border:0;background:transparent;text-align:left;cursor:pointer}
 .num{width:22px;height:22px;display:flex;align-items:center;justify-content:center;font:600 15px var(--display);color:var(--faint);font-variant-numeric:tabular-nums}
@@ -81,6 +81,25 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .seg button{height:34px;padding:0 10px;border:0;background:var(--surface);font:600 13px var(--body);color:#4F585D;cursor:pointer;font-variant-numeric:tabular-nums}
 .seg button+button{border-left:1px solid var(--field)}
 .seg button[aria-pressed="true"]{background:var(--fg);color:#fff}
+.devs{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px}
+.devs button{min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-radius:10px;border:1px solid var(--field);background:var(--surface);color:#4F585D;cursor:pointer;padding:4px 6px;min-width:0}
+.devs button b{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.devs button span{font:600 16px var(--display);font-variant-numeric:tabular-nums}
+.devs button[aria-pressed="true"]{border:2px solid var(--fg);background:var(--bg);color:var(--fg)}
+.tools{display:flex;flex-wrap:wrap;gap:6px}
+.obtn{height:40px;padding:0 11px;border:1.5px solid var(--fg);border-radius:10px;background:transparent;color:var(--fg);font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap}
+.obtn:active{background:var(--bg)}
+.obtn[aria-pressed="true"]{background:var(--fg);color:#fff}
+.obtn.danger{border-color:var(--down);color:var(--down)}
+.smallbtn.delbtn{border:1.5px solid var(--down);color:var(--down);background:transparent}
+.devs button b .dot{display:inline-flex;vertical-align:-3px;margin-right:5px}
+.devs button b .dot{width:16px;height:16px;flex:none}.devs button b .dot svg{width:10px;height:10px}
+.devedit{display:flex;gap:8px}.devedit .txt{flex:1;min-width:0}
+.order{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.order button{height:48px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;border:1px solid var(--field);background:var(--soft);font-size:14px;font-weight:600;cursor:pointer}
+.order button svg{width:16px;height:16px}
+.order button:disabled{opacity:.4;cursor:default}
+.sline .n small{color:var(--muted);font-size:12px}
 .marks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .marks button{height:48px;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;padding:0 6px;border:1px solid var(--field);background:var(--surface);color:#4F585D}
 .marks button[aria-pressed="true"][data-m="1"]{border:2px solid var(--up);background:var(--up-tint);color:var(--fg)}
@@ -89,7 +108,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .marks .dot{width:22px;height:22px}
 .marks .dot svg{width:14px;height:14px}
 .done{height:48px;border:0;border-radius:10px;background:var(--fg);color:#fff;font:700 18px var(--display);letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
-.extra{display:flex;justify-content:space-between;gap:12px}
+.extra{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 16px}
 .extra .danger{color:var(--down)}
 .txt{width:100%;height:44px;border:1px solid var(--field);border-radius:10px;background:var(--surface);font:16px var(--body);color:var(--fg);padding:0 12px}
 .editgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
@@ -97,6 +116,18 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .confirm div{display:flex;gap:8px}
 .smallbtn{height:40px;padding:0 14px;border-radius:8px;border:1px solid var(--field);background:var(--surface);font-weight:600;font-size:14px;cursor:pointer}
 .smallbtn.red{background:var(--down);border-color:var(--down);color:#fff}
+.listactions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:16px 16px 0;border-top:1px solid var(--line)}
+.outline{height:48px;display:flex;align-items:center;justify-content:center;gap:6px;border:1.5px solid var(--fg);border-radius:10px;background:transparent;color:var(--fg);font-weight:600;font-size:14px;cursor:pointer;padding:0 8px;white-space:nowrap}
+.outline svg{width:16px;height:16px;flex:none}
+.outline:active{background:var(--surface)}
+.sorthint{margin:0;padding:12px 16px;font-size:13px;color:var(--muted)}
+.sortrow .rowbtn{grid-template-columns:22px minmax(0,1fr) 44px;cursor:default}
+.grip{width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:var(--fg);display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;padding:0}
+.grip svg{width:22px;height:22px}
+.grip:active{cursor:grabbing;background:var(--line)}
+.row.dragging{position:relative;z-index:4;background:var(--surface);box-shadow:0 10px 28px rgba(23,27,30,.22);border-top-color:transparent}
+body.sorting{user-select:none;-webkit-user-select:none}
+.foot .done{width:100%}
 .addrow{width:100%;height:56px;border:0;border-top:1px solid var(--line);background:transparent;color:var(--accent);font-weight:600;font-size:15px;cursor:pointer;text-align:left;padding:0 16px}
 .foot{padding:16px 16px 8px;display:flex;flex-direction:column;gap:10px}
 .foot p{margin:0;font-size:12px;color:var(--muted)}
@@ -143,8 +174,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
   <div id="viewPlan">
     <div class="list" id="list"></div>
     <div class="foot">
-      <p>Tippe auf eine Übung, um Gewicht, Wiederholungen und Markierung zu ändern. Änderungen werden automatisch auf diesem Handy gespeichert.</p>
+      <p id="footNote">Tippe auf eine Übung, um Gewicht, Wiederholungen und Markierung zu ändern. Änderungen werden automatisch auf diesem Handy gespeichert.</p>
       <button class="save" id="saveBtn" type="button">Training speichern</button>
+      <button class="done" id="sortDone" type="button" hidden>Speichern</button>
       <div class="status" id="status"></div>
     </div>
   </div>
@@ -180,8 +212,9 @@ const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2
 /* ---------- state ---------- */
 let plan = {};            // dayId -> {id,title,sub,ex:[...],t}
 let sessions = {};        // docId -> {date,day,title,ex,t}
-let ui = { day: "TorsoA", open: null, view: "plan", editName: null, confirmDel: null, histOpen: null, histDel: null };
+let ui = { reorder: false, day: "TorsoA", open: null, view: "plan", editName: null, confirmDel: null, histOpen: null, histDel: null };
 let db = null;
+let mig = 0;
 DEFAULT_PLAN.forEach((d) => { plan[d.id] = Object.assign(clone(d), { t: 0 }); });
 
 function lsLoad() {
@@ -191,10 +224,21 @@ function lsLoad() {
       if (o.plan) for (const k in o.plan) if (plan[k] && o.plan[k].t >= plan[k].t) plan[k] = o.plan[k];
       if (o.sessions) sessions = o.sessions;
       if (o.day && plan[o.day]) ui.day = o.day;
+      mig = o.mig || 0;
     }
   } catch (e) {}
+  if (mig < 1) {
+    // Latzug: two machines with different plate stacks
+    for (const k in plan) for (const e of plan[k].ex) {
+      if (e.n === "Latzug breit" && !e.devs) {
+        e.devs = [{ label: "Gerät 1", kg: e.kg, reps: e.reps.slice(), step: e.step || 2.5 }, { label: "Gerät 2", kg: "48,5", reps: ["", "", ""], step: 2.5 }];
+        e.ai = 0;
+      }
+    }
+    mig = 1; lsSave();
+  }
 }
-function lsSave() { try { localStorage.setItem(LS, JSON.stringify({ plan, sessions, day: ui.day })); } catch (e) {} }
+function lsSave() { try { localStorage.setItem(LS, JSON.stringify({ plan, sessions, day: ui.day, mig })); } catch (e) {} }
 
 /* ---------- persistence ---------- */
 const timers = {};
@@ -234,6 +278,11 @@ function valsHTML(e) {
   return kg + '<span class="reps">' + e.reps.map((r) => esc(r || "–")).join(" · ") + "</span>";
 }
 function day() { return plan[ui.day]; }
+function devLabel(e) { return e.devs && e.devs.length > 1 ? (e.devs[e.ai || 0].label || "Variante " + ((e.ai || 0) + 1)) : ""; }
+function subLine(e) { return e.m || "Muskelgruppe"; }
+function titleLine(e) { const dl = devLabel(e); return (e.n || "Neue Übung") + (dl ? " (" + dl + ")" : ""); }
+function storeDev(e) { if (e.devs) { const i = e.ai || 0; e.devs[i] = { label: e.devs[i].label, kg: e.kg, reps: e.reps.slice(), step: e.step || 2.5, mark: e.mark || 0 }; } }
+function loadDev(e, i) { storeDev(e); const d = e.devs[i]; e.ai = i; e.kg = d.kg || ""; e.reps = (d.reps || ["", "", ""]).slice(); e.step = d.step || 2.5; e.mark = d.mark || 0; }
 const fmtKg = (n) => (Math.round(n * 100) / 100).toLocaleString("de-DE", { maximumFractionDigits: 2 });
 function stepKg(str, d) {
   const parts = String(str || "").split("/").map((p) => p.trim());
@@ -260,18 +309,36 @@ function lastSaved(dayId) {
 function renderHead() {
   $("histCount").textContent = Object.keys(sessions).length + " gespeicherte Trainings";
 }
+const GRIP = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 7.5h10M5 12.5h10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
 function rowHTML(e, i) {
+  if (ui.reorder) {
+    return '<div class="row sortrow" data-id="' + e.id + '"><div class="rowbtn">' +
+      '<span class="num">' + (e.mark ? markDot(e.mark, true) : i + 1) + "</span>" +
+      '<span class="names"><b>' + esc(titleLine(e)) + "</b><span>" + esc(subLine(e)) + "</span></span>" +
+      '<button class="grip" type="button" aria-label="' + esc(e.n || "Übung") + ' verschieben (Pfeiltasten hoch und runter)">' + GRIP + "</button></div></div>";
+  }
   const open = ui.open === e.id;
   let h = '<div class="row' + (open ? " open" : "") + '" data-id="' + e.id + '">' +
     '<button class="rowbtn" type="button" data-act="toggle" aria-expanded="' + open + '">' +
     '<span class="num">' + (e.mark ? markDot(e.mark, true) : i + 1) + "</span>" +
-    '<span class="names"><b>' + esc(e.n || "Neue Übung") + "</b><span>" + esc(e.m || "Muskelgruppe") + "</span></span>" +
+    '<span class="names"><b>' + esc(titleLine(e)) + "</b><span>" + esc(subLine(e)) + "</span></span>" +
     '<span class="vals" data-vals>' + valsHTML(e) + "</span></button>";
   if (open) {
     h += '<div class="panel">';
     if (ui.editName === e.id) {
       h += '<div class="editgrid"><div class="f"><label class="lbl" for="nm-' + e.id + '">Übung</label><input class="txt" id="nm-' + e.id + '" data-f="n" value="' + esc(e.n) + '" autocomplete="off"></div>' +
-        '<div class="f"><label class="lbl" for="mg-' + e.id + '">Muskelgruppe</label><input class="txt" id="mg-' + e.id + '" data-f="m" value="' + esc(e.m) + '" autocomplete="off"></div></div>';
+        '<div class="f"><label class="lbl" for="mg-' + e.id + '">Muskelgruppe</label><input class="txt" id="mg-' + e.id + '" data-f="m" value="' + esc(e.m) + '" autocomplete="off"></div>';
+      if (e.devs && e.devs.length > 1) e.devs.forEach((dv, k) => {
+        h += '<div class="f"><label class="lbl" for="dl' + k + "-" + e.id + '">Name Variante ' + (k + 1) + '</label><div class="devedit"><input class="txt" id="dl' + k + "-" + e.id + '" data-f="dl' + k + '" value="' + esc(dv.label) + '" autocomplete="off"><button class="smallbtn delbtn" type="button" data-act="rmdev" data-i="' + k + '" aria-label="Variante ' + (k + 1) + ' löschen">Löschen</button></div></div>';
+      });
+      if ((e.devs || []).length < 3) h += '<div><button class="linkbtn" type="button" data-act="adddev">+ Variante hinzufügen</button></div>';
+      h += "</div>";
+    }
+    if (e.devs && e.devs.length > 1) {
+      h += '<div class="f"><span class="lbl">Variante</span><div class="devs" role="group" aria-label="Variante wählen">' + e.devs.map((dv, k) => {
+        const act = k === (e.ai || 0), kg = act ? e.kg : dv.kg, mk = act ? e.mark : (dv.mark || 0);
+        return '<button type="button" data-act="dev" data-i="' + k + '" aria-pressed="' + act + '"><b>' + (mk ? markDot(mk, true) : "") + esc(dv.label || "Variante " + (k + 1)) + "</b><span>" + (kg ? esc(kg) + " kg" : "ohne Gewicht") + "</span></button>";
+      }).join("") + "</div></div>";
     }
     const stp = e.step || 2.5;
     h += '<div class="steps"><div class="srow"><div class="slbl"><label class="lbl" for="kg-' + e.id + '">Gewicht kg</label>' +
@@ -291,14 +358,18 @@ function rowHTML(e, i) {
         '<button class="smallbtn" type="button" data-act="cancelDel">Abbrechen</button><button class="smallbtn red" type="button" data-act="del">Entfernen</button></div></div>';
     }
     h += '<button class="done" type="button" data-act="toggle">Fertig</button>' +
-      '<div class="extra"><button class="linkbtn" type="button" data-act="rename">' + (ui.editName === e.id ? "Name fertig" : "Name ändern") + "</button>" +
-      '<button class="linkbtn danger" type="button" data-act="askDel">Übung entfernen</button></div></div>';
+      '<div class="tools"><button class="obtn" type="button" data-act="rename" aria-pressed="' + (ui.editName === e.id) + '">Bearbeiten</button>' +
+      '<button class="obtn danger" type="button" data-act="askDel">Übung löschen</button></div></div>';
   }
   return h + "</div>";
 }
 function renderList() {
   const d = day();
-  $("list").innerHTML = d.ex.map(rowHTML).join("") + '<button class="addrow" type="button" data-act="add">+ Übung hinzufügen</button>';
+  $("list").innerHTML = (ui.reorder ? '<p class="sorthint">Halte den Anfasser rechts gedrückt und zieh die Übung an die gewünschte Stelle.</p>' : "") +
+    d.ex.map(rowHTML).join("") +
+    (ui.reorder ? "" : '<div class="listactions"><button class="outline" type="button" data-act="add"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Übung hinzufügen</button>' +
+      '<button class="outline" type="button" data-act="reorder"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2.5v11M2.5 5L5 2.5 7.5 5M11 13.5v-11M8.5 11l2.5 2.5 2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Reihenfolge anpassen</button></div>');
+  $("footNote").hidden = ui.reorder; $("saveBtn").hidden = ui.reorder; $("status").hidden = ui.reorder; $("sortDone").hidden = !ui.reorder;
 }
 function renderHist() {
   const ids = Object.keys(sessions).sort((a, b) => (sessions[b].date + sessions[b].t).localeCompare(sessions[a].date + sessions[a].t));
@@ -310,7 +381,7 @@ function renderHist() {
     const s = sessions[id], open = ui.histOpen === id;
     let h = '<div class="sess"><button class="sessbtn" type="button" data-hact="open" data-sid="' + id + '" aria-expanded="' + open + '"><b>' + esc(s.title) + "</b><span>" + dlabel(s.date) + "</span></button>";
     if (open) {
-      h += '<div class="sessbody">' + s.ex.map((e, i) => '<div class="sline"><span class="num" style="width:18px;height:18px">' + (e.mark ? markDot(e.mark, true) : i + 1) + '</span><span class="n">' + esc(e.n) + '</span><span class="v">' + (e.kg ? esc(e.kg) + " kg \u2003" : "") + e.reps.map((r) => esc(r || "–")).join(" · ") + "</span></div>").join("");
+      h += '<div class="sessbody">' + s.ex.map((e, i) => '<div class="sline"><span class="num" style="width:18px;height:18px">' + (e.mark ? markDot(e.mark, true) : i + 1) + '</span><span class="n">' + esc(e.n) + (e.dl ? " (" + esc(e.dl) + ")" : "") + '</span><span class="v">' + (e.kg ? esc(e.kg) + " kg \u2003" : "") + e.reps.map((r) => esc(r || "–")).join(" · ") + "</span></div>").join("");
       h += ui.histDel === id
         ? '<div class="confirm" style="margin-top:10px"><span>Training löschen?</span><div><button class="smallbtn" type="button" data-hact="cancel" data-sid="' + id + '">Abbrechen</button><button class="smallbtn red" type="button" data-hact="del" data-sid="' + id + '">Löschen</button></div></div>'
         : '<div class="extra" style="margin-top:6px"><span></span><button class="linkbtn danger" type="button" data-hact="ask" data-sid="' + id + '">Training löschen</button></div>';
@@ -347,11 +418,12 @@ $("tabs").addEventListener("click", (ev) => {
   const b = ev.target.closest("[data-day]"); if (!b) return;
   ui.day = b.dataset.day; ui.open = null; ui.view = "plan"; ui.editName = null; ui.confirmDel = null; lsSave(); render(); window.scrollTo(0, 0);
 });
-$("histToggle").onclick = () => { ui.view = ui.view === "hist" ? "plan" : "hist"; render(); window.scrollTo(0, 0); };
+$("histToggle").onclick = () => { ui.reorder = false; ui.view = ui.view === "hist" ? "plan" : "hist"; render(); window.scrollTo(0, 0); };
 
 $("list").addEventListener("click", (ev) => {
   const b = ev.target.closest("[data-act]"); if (!b) return;
   const act = b.dataset.act, d = day();
+  if (act === "reorder") { ui.reorder = true; ui.open = null; ui.editName = null; ui.confirmDel = null; render(); window.scrollTo(0, 0); return; }
   if (act === "add") {
     const e = { id: newId(), n: "", m: "", kg: "", reps: ["", "", ""], mark: 0 };
     d.ex.push(e); ui.open = e.id; ui.editName = e.id; touchPlan(d.id); render();
@@ -363,14 +435,37 @@ $("list").addEventListener("click", (ev) => {
   if (act === "toggle") {
     const opening = ui.open !== id;
     ui.open = opening ? id : null; ui.editName = null; ui.confirmDel = null; render();
-    if (opening) { const r = document.querySelector('.row[data-id="' + id + '"]'); if (r && r.getBoundingClientRect().top < 160) r.scrollIntoView({ block: "center" }); }
+    if (opening) { const r = document.querySelector('.row[data-id="' + id + '"]'); if (r && r.getBoundingClientRect().top < 160) r.scrollIntoView({ block: "start" }); }
   } else if (act === "inc" || act === "dec") {
     const f = b.dataset.f, sign = act === "inc" ? 1 : -1;
     if (f === "kg") e.kg = stepKg(e.kg, sign * (e.step || 2.5));
     else { const j = +f.slice(1); e.reps[j] = stepReps(e.reps[j], sign); }
     const inp = row.querySelector('input[data-f="' + f + '"]'); if (inp) inp.value = f === "kg" ? e.kg : e.reps[+f.slice(1)];
     row.querySelector("[data-vals]").innerHTML = valsHTML(e);
+    if (f === "kg") { const sp = row.querySelector('.devs [aria-pressed="true"] span'); if (sp) sp.textContent = e.kg ? e.kg + " kg" : "ohne Gewicht"; }
     touchPlan(d.id);
+  } else if (act === "up" || act === "down") {
+    const to = idx + (act === "up" ? -1 : 1); if (to < 0 || to >= d.ex.length) return;
+    d.ex.splice(idx, 1); d.ex.splice(to, 0, e); touchPlan(d.id); render();
+    const r = document.querySelector('.row[data-id="' + id + '"]'), btn = r && r.querySelector('[data-act="' + act + '"]');
+    if (r) { const top = r.getBoundingClientRect().top; if (top < 150 || top > window.innerHeight - 200) r.scrollIntoView({ block: "start" }); }
+    if (btn && !btn.disabled) btn.focus();
+  } else if (act === "dev") {
+    loadDev(e, +b.dataset.i); touchPlan(d.id); render();
+  } else if (act === "adddev") {
+    if (!e.devs) e.devs = [{ label: "Variante 1", kg: e.kg, reps: e.reps.slice(), step: e.step || 2.5 }];
+    storeDev(e);
+    e.devs.push({ label: "Variante " + (e.devs.length + 1), kg: "", reps: e.reps.map(() => ""), step: e.step || 2.5, mark: 0 });
+    loadDev(e, e.devs.length - 1); ui.editName = id; touchPlan(d.id); render();
+    toast("Variante " + e.devs.length + " angelegt. Gib ihr einen Namen und trag das Gewicht ein.");
+  } else if (act === "rmdev") {
+    storeDev(e);
+    const k = +b.dataset.i, removed = e.devs.splice(k, 1)[0];
+    let ai = e.ai || 0; if (ai >= k && ai > 0) ai--; else if (ai === k) ai = 0;
+    e.ai = ai; const cur = e.devs[ai]; e.kg = cur.kg; e.reps = cur.reps.slice(); e.step = cur.step || 2.5; e.mark = cur.mark || 0;
+    if (e.devs.length < 2) { delete e.devs; delete e.ai; ui.editName = null; }
+    touchPlan(d.id); render();
+    toast((removed.label || "Variante") + " entfernt");
   } else if (act === "step") {
     e.step = parseFloat(b.dataset.s); touchPlan(d.id); render();
   } else if (act === "mark") {
@@ -389,16 +484,77 @@ $("list").addEventListener("input", (ev) => {
   const inp = ev.target, f = inp.dataset.f; if (!f) return;
   const row = inp.closest(".row"), d = day(), e = d.ex.find((x) => x.id === row.dataset.id); if (!e) return;
   const v = inp.value.trim();
-  if (f === "kg") e.kg = v; else if (f === "n") e.n = inp.value; else if (f === "m") e.m = inp.value; else e.reps[+f.slice(1)] = v;
+  if (f === "kg") e.kg = v; else if (f === "n") e.n = inp.value; else if (f === "m") e.m = inp.value;
+  else if (f.startsWith("dl")) { e.devs[+f.slice(2)].label = inp.value; const bt = row.querySelector('.devs [data-i="' + f.slice(2) + '"] b'); if (bt) bt.textContent = inp.value || "Variante " + (+f.slice(2) + 1); }
+  else e.reps[+f.slice(1)] = v;
   row.querySelector("[data-vals]").innerHTML = valsHTML(e);
-  const names = row.querySelector(".names"); names.children[0].textContent = e.n || "Neue Übung"; names.children[1].textContent = e.m || "Muskelgruppe";
+  if (f === "kg") { const sp = row.querySelector('.devs [aria-pressed="true"] span'); if (sp) sp.textContent = e.kg ? e.kg + " kg" : "ohne Gewicht"; }
+  const names = row.querySelector(".names"); names.children[0].textContent = titleLine(e); names.children[1].textContent = subLine(e);
   touchPlan(d.id);
 });
-$("list").addEventListener("keydown", (ev) => { if (ev.key === "Enter" && ev.target.tagName === "INPUT") ev.target.blur(); });
+$("list").addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter" && ev.target.tagName === "INPUT") ev.target.blur();
+  const g = ev.target.closest && ev.target.closest(".grip");
+  if (g && (ev.key === "ArrowUp" || ev.key === "ArrowDown")) {
+    ev.preventDefault();
+    const d = day(), id = g.closest(".row").dataset.id, i = d.ex.findIndex((x) => x.id === id), to = i + (ev.key === "ArrowUp" ? -1 : 1);
+    if (to < 0 || to >= d.ex.length) return;
+    const [e] = d.ex.splice(i, 1); d.ex.splice(to, 0, e); touchPlan(d.id); render();
+    const ng = document.querySelector('.row[data-id="' + id + '"] .grip'); if (ng) ng.focus();
+  }
+});
+$("sortDone").onclick = () => { ui.reorder = false; render(); };
+
+/* ---------- drag & drop ---------- */
+let drag = null;
+$("list").addEventListener("pointerdown", (ev) => {
+  const g = ev.target.closest(".grip"); if (!g || !ui.reorder) return;
+  ev.preventDefault();
+  const row = g.closest(".row");
+  g.setPointerCapture(ev.pointerId);
+  drag = { row, grip: g, id: ev.pointerId, y: ev.clientY, grab: ev.clientY - row.getBoundingClientRect().top, raf: 0 };
+  row.classList.add("dragging"); document.body.classList.add("sorting");
+  const loop = () => {
+    if (!drag) return;
+    const edgeTop = 150, edgeBot = window.innerHeight - 70;
+    if (drag.y < edgeTop) window.scrollBy(0, -Math.ceil((edgeTop - drag.y) / 6));
+    else if (drag.y > edgeBot) window.scrollBy(0, Math.ceil((drag.y - edgeBot) / 6));
+    place();
+    drag.raf = requestAnimationFrame(loop);
+  };
+  drag.raf = requestAnimationFrame(loop);
+});
+function place() {
+  const r = drag.row; r.style.transform = "";
+  let moved = true;
+  while (moved) {
+    moved = false;
+    const prev = r.previousElementSibling, next = r.nextElementSibling;
+    if (prev && prev.classList.contains("row")) { const b = prev.getBoundingClientRect(); if (drag.y - drag.grab < b.top + b.height / 2) { r.parentNode.insertBefore(r, prev); moved = true; continue; } }
+    if (next && next.classList.contains("row")) { const b = next.getBoundingClientRect(); if (drag.y - drag.grab + r.offsetHeight > b.top + b.height / 2) { r.parentNode.insertBefore(next, r); moved = true; } }
+  }
+  const top = r.getBoundingClientRect().top;
+  r.style.transform = "translateY(" + (drag.y - drag.grab - top) + "px)";
+}
+$("list").addEventListener("pointermove", (ev) => { if (drag && ev.pointerId === drag.id) { drag.y = ev.clientY; } });
+function endDrag(ev) {
+  if (!drag || (ev && ev.pointerId !== drag.id)) return;
+  cancelAnimationFrame(drag.raf);
+  drag.row.classList.remove("dragging"); drag.row.style.transform = ""; document.body.classList.remove("sorting");
+  const d = day(), order = [...$("list").querySelectorAll(".row")].map((r) => r.dataset.id);
+  const before = d.ex.map((e) => e.id).join();
+  d.ex.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+  const id = drag.row.dataset.id; drag = null;
+  if (d.ex.map((e) => e.id).join() !== before) touchPlan(d.id);
+  render();
+  const g = document.querySelector('.row[data-id="' + id + '"] .grip'); if (g) g.focus({ preventScroll: true });
+}
+$("list").addEventListener("pointerup", endDrag);
+$("list").addEventListener("pointercancel", endDrag);
 
 $("saveBtn").onclick = () => {
   const d = day(), id = todayKey() + "_" + d.id, existed = !!sessions[id];
-  sessions[id] = { type: "session", date: todayKey(), day: d.id, title: d.title, ex: clone(d.ex).map((e) => ({ n: e.n, m: e.m, kg: e.kg, reps: e.reps, mark: e.mark })), t: Date.now() };
+  sessions[id] = { type: "session", date: todayKey(), day: d.id, title: d.title, ex: clone(d.ex).map((e) => ({ n: e.n, m: e.m, dl: devLabel(e), kg: e.kg, reps: e.reps, mark: e.mark })), t: Date.now() };
   writeSession(id); ui.open = null; render();
   toast(existed ? d.title + " von heute aktualisiert" : d.title + " gespeichert");
 };
