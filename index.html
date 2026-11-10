@@ -365,6 +365,7 @@ body{letter-spacing:-.01em}
 .save{box-shadow:0 8px 20px -8px rgba(138,134,255,.65)}
 .ibtn.danger{color:#f25c4a}
 .devs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.dlg button[data-d="no"]{background:var(--fg);border-color:var(--fg);color:#111}
 </style>
 </head>
 <body>
@@ -706,9 +707,9 @@ function askDelete(d, e) {
   dlgBack = document.activeElement;
   const multi = e.devs && e.devs.length > 1, name = esc(e.n || "Übung"), vl = esc(devLabel(e));
   const o = document.createElement("div"); o.className = "dlg"; o.id = "dlg";
-  o.innerHTML = '<div class="box" role="alertdialog" aria-modal="true" aria-labelledby="dlgT" aria-describedby="dlgP"><h3 id="dlgT">' + (multi ? "Variante / Übung löschen" : "Übung löschen?") + "</h3>" +
+  o.innerHTML = '<div class="box" role="alertdialog" aria-modal="true" aria-labelledby="dlgT" aria-describedby="dlgP"><h3 id="dlgT">' + (multi ? "Übung oder Variante löschen" : "Übung löschen?") + "</h3>" +
     '<p id="dlgP">' + (multi ? "„" + name + "“ hat mehrere Varianten. Du kannst nur die Variante „" + vl + "“ oder die ganze Übung mit allen Varianten löschen." : "„" + name + "“ wird aus " + esc(d.title) + " entfernt.") + "</p>" +
-    (multi ? '<button type="button" class="red" data-d="ex">Ganze Übung löschen</button><button type="button" class="redline" data-d="dev">Variante „' + vl + '“ löschen</button>'
+    (multi ? '<button type="button" class="red" data-d="ex">Übung löschen</button><button type="button" class="redline" data-d="dev">Variante „' + vl + '“ löschen</button>'
       : '<button type="button" class="red" data-d="ex">Löschen</button>') +
     '<button type="button" data-d="no">Abbrechen</button></div>';
   o.addEventListener("click", (ev) => {
