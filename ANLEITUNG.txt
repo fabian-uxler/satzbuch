@@ -1,4 +1,4 @@
-SATZBUCH – OFFLINE-APP EINRICHTEN
+MUSCLE MEMORY – OFFLINE-APP EINRICHTEN
 
 1. Kostenloses Konto auf github.com anlegen (falls noch keins vorhanden).
 2. Neues Repository anlegen: Name "satzbuch", Sichtbarkeit "Public".

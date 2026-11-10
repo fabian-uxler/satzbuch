@@ -1,4 +1,5 @@
-# Satzbuch
+# Muscle Memory
+(App-Name „Muscle Memory“; Repo, URL, Speicher-Schlüssel und Cache-Namen heißen weiter „satzbuch“.)
 Offline-Web-App (PWA) zum Tracken von Krafttraining, gehostet auf GitHub Pages
 (https://fabian-uxler.github.io/satzbuch/).
 

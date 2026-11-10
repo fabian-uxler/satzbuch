@@ -1,14 +1,14 @@
 {
   "id": "/myhabits/",
-  "name": "MyHabits",
-  "short_name": "MyHabits",
-  "description": "Gewohnheiten täglich abhaken, mit Notizen, Serien und Wiederholungen.",
+  "name": "Muscle Memory",
+  "short_name": "Muscle Memory",
+  "description": "Krafttraining tracken: Gewichte, Sätze und Wiederholungen pro Trainingstag.",
   "lang": "de",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#eef1f4",
-  "theme_color": "#0f7a4a",
+  "background_color": "#1c1c1e",
+  "theme_color": "#1c1c1e",
   "icons": [
     {
       "src": "icon-192.png",
