@@ -1,5 +1,5 @@
 {
-  "id": "/myhabits/",
+  "id": "/satzbuch/",
   "name": "Muscle Memory",
   "short_name": "Muscle Memory",
   "description": "Krafttraining tracken: Gewichte, Sätze und Wiederholungen pro Trainingstag.",
@@ -23,7 +23,7 @@
       "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
