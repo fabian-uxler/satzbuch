@@ -107,14 +107,24 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .marks button[aria-pressed="true"][data-m="-1"]{border:2px solid var(--down);background:var(--down-tint);color:var(--fg)}
 .marks .dot{width:22px;height:22px}
 .marks .dot svg{width:14px;height:14px}
-.smk{display:flex;gap:6px}
-.smk button{width:44px;height:40px;border:1px solid var(--field);border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
-.smk button .dot{width:20px;height:20px;background:#B3BBB7}.smk button .dot svg{width:12px;height:12px}
-.smk button[aria-pressed="true"][data-m="1"]{border:2px solid var(--up);background:var(--up-tint)}.smk button[aria-pressed="true"][data-m="1"] .dot{background:var(--up)}
-.smk button[aria-pressed="true"][data-m="-1"]{border:2px solid var(--down);background:var(--down-tint)}.smk button[aria-pressed="true"][data-m="-1"] .dot{background:var(--down)}
-.setacts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.setacts button{height:44px;padding:0 8px;white-space:nowrap}
-.setacts button:disabled{opacity:.4;cursor:default}
+.sets{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:14px}
+.setrow{display:flex;align-items:center;gap:8px}
+.swb{flex:1;min-width:0;display:flex;align-items:center;gap:6px}
+.swb .num-in{flex:1;min-width:0;font-size:18px}
+.swb .num-in::placeholder{color:var(--faint);opacity:1}
+.swb .arr{width:20px;height:20px;flex:none;display:flex;align-items:center;justify-content:center}
+.swb .arr .dot{width:20px;height:20px}.swb .arr .dot svg{width:12px;height:12px}
+.panel .ctl{grid-template-columns:44px 76px 44px}
+.panel .pm{width:44px}
+.steps>.srow{flex-wrap:wrap;row-gap:8px}
+.steps>.srow .ctl{margin-left:auto}
+@media (max-width:359px){.panel .ctl{grid-template-columns:40px 60px 40px}.panel .pm{width:40px}.xbtn{width:32px}}
+.seg button{padding:0 9px}
+.xbtn{width:40px;height:48px;flex:none;border:0;border-radius:10px;background:transparent;color:var(--down);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.xbtn svg{width:18px;height:18px}
+.xbtn:active{background:var(--down-tint)}
+.xbtn:disabled{opacity:.3;cursor:default}
+.addset{height:44px;width:100%}
 .rm{display:inline-flex;align-items:center;gap:2px}
 .rm .dot{width:14px;height:14px;align-self:center}.rm .dot svg{width:9px;height:9px}
 .rm.up{color:var(--up)}.rm.down{color:var(--down)}
@@ -195,7 +205,7 @@ body.sorting{user-select:none;-webkit-user-select:none}
     <div class="week" id="week" role="group" aria-label="Diese Woche"></div>
     <div class="list" id="list"></div>
     <div class="foot">
-      <p id="footNote">Tippe auf eine Übung, um Gewicht, Sätze, Wiederholungen und Markierungen zu ändern. Änderungen werden automatisch auf diesem Handy gespeichert.</p>
+      <p id="footNote">Tippe auf eine Übung, um Gewicht, Sätze und Wiederholungen zu ändern. Ein abweichendes Gewicht pro Satz bekommt automatisch einen Pfeil. Änderungen werden automatisch auf diesem Handy gespeichert.</p>
       <button class="save" id="saveBtn" type="button">Training speichern</button>
       <button class="done" id="sortDone" type="button" hidden>Speichern</button>
       <div class="status" id="status"></div>
@@ -311,9 +321,15 @@ function normEx(o) {
   o.mark = sumMark(o.marks);
 }
 function normAll() {
-  for (const k in plan) for (const e of plan[k].ex || []) { normEx(e); (e.devs || []).forEach(normEx); }
+  for (const k in plan) for (const e of plan[k].ex || []) { normEx(e); normSw(e); (e.devs || []).forEach((v) => { normEx(v); normSw(v); }); }
   for (const k in sessions) (sessions[k].ex || []).forEach(normEx);
 }
+// Gewicht pro Satz (sw[j]); leer = allgemeines Gewicht. Pfeil ergibt sich aus dem Vergleich mit dem allgemeinen Gewicht.
+const kgNum = (s) => { const v = parseFloat(String(s == null ? "" : s).split("/")[0].trim().replace(",", ".").replace(/^\+/, "")); return isNaN(v) ? null : v; };
+function setMark(w, kg) { const a = kgNum(w); if (a == null) return 0; const b = kgNum(kg) || 0; return a > b ? 1 : a < b ? -1 : 0; }
+const setMarks = (e) => e.reps.map((_, j) => setMark((e.sw || [])[j], e.kg));
+const marksOf = (e) => (Array.isArray(e.sw) ? setMarks(e) : e.marks || []);
+function normSw(o) { if (!Array.isArray(o.sw)) o.sw = []; o.sw = o.reps.map((r, j) => (o.sw[j] == null ? "" : String(o.sw[j]))); }
 function repsHTML(reps, marks) {
   return reps.map((r, j) => {
     const m = (marks || [])[j] || 0, t = esc(r || "–");
@@ -322,15 +338,15 @@ function repsHTML(reps, marks) {
 }
 function valsHTML(e) {
   const kg = e.kg ? '<span class="kg">' + esc(e.kg) + "<small>kg</small></span>" : "";
-  return kg + '<span class="reps">' + repsHTML(e.reps, e.marks) + "</span>";
+  return kg + '<span class="reps">' + repsHTML(e.reps, marksOf(e)) + "</span>";
 }
 const valsCls = (e) => "vals" + (e.reps.length > 3 ? " many" : "");
 function day() { return plan[ui.day]; }
 function devLabel(e) { return e.devs && e.devs.length > 1 ? (e.devs[e.ai || 0].label || "Variante " + ((e.ai || 0) + 1)) : ""; }
 function subLine(e) { return e.m || "Muskelgruppe"; }
 function titleLine(e) { const dl = devLabel(e); return (e.n || "Neue Übung") + (dl ? " (" + dl + ")" : ""); }
-function storeDev(e) { if (e.devs) { const i = e.ai || 0; e.devs[i] = { label: e.devs[i].label, kg: e.kg, reps: e.reps.slice(), marks: e.marks.slice(), step: e.step || 2.5, mark: sumMark(e.marks) }; } }
-function loadDev(e, i) { storeDev(e); const d = e.devs[i]; e.ai = i; e.kg = d.kg || ""; normEx(d); e.reps = d.reps.slice(); e.marks = d.marks.slice(); e.step = d.step || 2.5; e.mark = sumMark(e.marks); }
+function storeDev(e) { if (e.devs) { const i = e.ai || 0; e.devs[i] = { label: e.devs[i].label, kg: e.kg, reps: e.reps.slice(), sw: e.sw.slice(), marks: setMarks(e), step: e.step || 2.5, mark: sumMark(setMarks(e)) }; } }
+function loadDev(e, i) { storeDev(e); const d = e.devs[i]; e.ai = i; e.kg = d.kg || ""; normEx(d); normSw(d); e.reps = d.reps.slice(); e.sw = d.sw.slice(); e.marks = d.marks.slice(); e.step = d.step || 2.5; e.mark = sumMark(e.marks); }
 const fmtKg = (n) => (Math.round(n * 100) / 100).toLocaleString("de-DE", { maximumFractionDigits: 2 });
 function stepKg(str, d) {
   const parts = String(str || "").split("/").map((p) => p.trim());
@@ -380,14 +396,14 @@ const GRIP = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 7.5h10M5 1
 function rowHTML(e, i) {
   if (ui.reorder) {
     return '<div class="row sortrow" data-id="' + e.id + '"><div class="rowbtn">' +
-      '<span class="num">' + (e.mark ? markDot(e.mark, true) : i + 1) + "</span>" +
+      '<span class="num">' + (sumMark(marksOf(e)) ? markDot(sumMark(marksOf(e)), true) : i + 1) + "</span>" +
       '<span class="names"><b>' + esc(titleLine(e)) + "</b><span>" + esc(subLine(e)) + "</span></span>" +
       '<button class="grip" type="button" aria-label="' + esc(e.n || "Übung") + ' verschieben (Pfeiltasten hoch und runter)">' + GRIP + "</button></div></div>";
   }
   const open = ui.open === e.id;
   let h = '<div class="row' + (open ? " open" : "") + '" data-id="' + e.id + '">' +
     '<button class="rowbtn" type="button" data-act="toggle" aria-expanded="' + open + '">' +
-    '<span class="num">' + (e.mark ? markDot(e.mark, true) : i + 1) + "</span>" +
+    '<span class="num">' + (sumMark(marksOf(e)) ? markDot(sumMark(marksOf(e)), true) : i + 1) + "</span>" +
     '<span class="names"><b>' + esc(titleLine(e)) + "</b><span>" + esc(subLine(e)) + "</span></span>" +
     '<span class="' + valsCls(e) + '" data-vals>' + valsHTML(e) + "</span></button>";
   if (open) {
@@ -403,23 +419,24 @@ function rowHTML(e, i) {
     }
     if (e.devs && e.devs.length > 1) {
       h += '<div class="f"><span class="lbl">Variante</span><div class="devs" role="group" aria-label="Variante wählen">' + e.devs.map((dv, k) => {
-        const act = k === (e.ai || 0), kg = act ? e.kg : dv.kg, mk = act ? e.mark : (dv.mark || 0);
+        const act = k === (e.ai || 0), kg = act ? e.kg : dv.kg, mk = sumMark(marksOf(act ? e : dv));
         return '<button type="button" data-act="dev" data-i="' + k + '" aria-pressed="' + act + '"><b>' + (mk ? markDot(mk, true) : "") + esc(dv.label || "Variante " + (k + 1)) + "</b><span>" + (kg ? esc(kg) + " kg" : "ohne Gewicht") + "</span></button>";
       }).join("") + "</div></div>";
     }
     const stp = e.step || 2.5;
     h += '<div class="steps"><div class="srow"><div class="slbl"><label class="lbl" for="kg-' + e.id + '">Gewicht kg</label>' +
-      '<div class="seg" role="group" aria-label="Schrittweite"><button type="button" data-act="step" data-s="1.25" aria-pressed="' + (stp === 1.25) + '">±1,25</button><button type="button" data-act="step" data-s="2.5" aria-pressed="' + (stp === 2.5) + '">±2,5</button></div></div>' +
+      '<div class="seg" role="group" aria-label="Schrittweite"><button type="button" data-act="step" data-s="1" aria-pressed="' + (stp === 1) + '">±1</button><button type="button" data-act="step" data-s="1.25" aria-pressed="' + (stp === 1.25) + '">±1,25</button><button type="button" data-act="step" data-s="2.5" aria-pressed="' + (stp === 2.5) + '">±2,5</button></div></div>' +
       '<div class="ctl"><button class="pm" type="button" data-act="dec" data-f="kg" aria-label="Gewicht ' + fmtKg(stp) + ' kg weniger">−</button><input class="num-in kgf" id="kg-' + e.id + '" data-f="kg" inputmode="decimal" value="' + esc(e.kg) + '" placeholder="–" autocomplete="off"><button class="pm" type="button" data-act="inc" data-f="kg" aria-label="Gewicht ' + fmtKg(stp) + ' kg mehr">+</button></div></div>';
+    h += '</div><div class="sets">';
+    const sm = setMarks(e);
     e.reps.forEach((r, j) => {
-      h += '<div class="srow"><div class="slbl"><label class="lbl" for="r' + j + "-" + e.id + '">Satz ' + (j + 1) + ' · Wdh.</label>' +
-        '<div class="smk" role="group" aria-label="Markierung Satz ' + (j + 1) + '">' +
-        '<button type="button" data-act="smark" data-j="' + j + '" data-m="1" aria-pressed="' + (e.marks[j] === 1) + '" aria-label="Satz ' + (j + 1) + ' steigern"><span class="dot">' + UP + "</span></button>" +
-        '<button type="button" data-act="smark" data-j="' + j + '" data-m="-1" aria-pressed="' + (e.marks[j] === -1) + '" aria-label="Satz ' + (j + 1) + ' senken"><span class="dot">' + DN + "</span></button></div></div>" +
-        '<div class="ctl"><button class="pm" type="button" data-act="dec" data-f="r' + j + '" aria-label="Satz ' + (j + 1) + ' eine Wiederholung weniger">−</button><input class="num-in" id="r' + j + "-" + e.id + '" data-f="r' + j + '" inputmode="numeric" value="' + esc(r) + '" placeholder="–" autocomplete="off"><button class="pm" type="button" data-act="inc" data-f="r' + j + '" aria-label="Satz ' + (j + 1) + ' eine Wiederholung mehr">+</button></div></div>';
+      const n = j + 1;
+      h += '<div class="setrow" data-j="' + j + '"><div class="swb"><input class="num-in" id="w' + j + "-" + e.id + '" data-f="w' + j + '" inputmode="decimal" value="' + esc(e.sw[j]) + '" placeholder="' + esc(e.kg || "kg") + '" autocomplete="off" aria-label="Satz ' + n + ' Gewicht in kg (leer = allgemeines Gewicht)">' +
+        '<span class="arr" data-arr>' + markDot(sm[j], true) + "</span></div>" +
+        '<div class="ctl"><button class="pm" type="button" data-act="dec" data-f="r' + j + '" aria-label="Satz ' + n + ' eine Wiederholung weniger">−</button><input class="num-in" id="r' + j + "-" + e.id + '" data-f="r' + j + '" inputmode="numeric" value="' + esc(r) + '" placeholder="–" autocomplete="off" aria-label="Satz ' + n + ' Wiederholungen"><button class="pm" type="button" data-act="inc" data-f="r' + j + '" aria-label="Satz ' + n + ' eine Wiederholung mehr">+</button></div>' +
+        '<button class="xbtn" type="button" data-act="rmset" data-j="' + j + '" aria-label="Satz ' + n + ' entfernen"' + (e.reps.length < 2 ? " disabled" : "") + '><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>';
     });
-    h += '<div class="setacts"><button class="smallbtn" type="button" data-act="addset">+ Satz hinzufügen</button>' +
-      '<button class="smallbtn" type="button" data-act="rmset"' + (e.reps.length < 2 ? " disabled" : "") + '>− Letzten Satz</button></div>';
+    h += '<button class="smallbtn addset" type="button" data-act="addset">+ Satz hinzufügen</button>';
     h += "</div>";
     if (ui.confirmDel === e.id) {
       h += '<div class="confirm"><span>Übung aus ' + esc(day().title) + " entfernen?</span><div>" +
@@ -449,7 +466,7 @@ function renderHist() {
     const s = sessions[id], open = ui.histOpen === id;
     let h = '<div class="sess"><button class="sessbtn" type="button" data-hact="open" data-sid="' + id + '" aria-expanded="' + open + '"><b>' + esc(s.title) + "</b><span>" + dlabel(s.date) + "</span></button>";
     if (open) {
-      h += '<div class="sessbody">' + s.ex.map((e, i) => '<div class="sline"><span class="num" style="width:18px;height:18px">' + (e.mark ? markDot(e.mark, true) : i + 1) + '</span><span class="n">' + esc(e.n) + (e.dl ? " (" + esc(e.dl) + ")" : "") + '</span><span class="v">' + (e.kg ? esc(e.kg) + " kg \u2003" : "") + repsHTML(e.reps, e.marks) + "</span></div>").join("");
+      h += '<div class="sessbody">' + s.ex.map((e, i) => '<div class="sline"><span class="num" style="width:18px;height:18px">' + (sumMark(marksOf(e)) ? markDot(sumMark(marksOf(e)), true) : i + 1) + '</span><span class="n">' + esc(e.n) + (e.dl ? " (" + esc(e.dl) + ")" : "") + '</span><span class="v">' + (e.kg ? esc(e.kg) + " kg \u2003" : "") + repsHTML(e.reps, marksOf(e)) + "</span></div>").join("");
       h += ui.histDel === id
         ? '<div class="confirm" style="margin-top:10px"><span>Training löschen?</span><div><button class="smallbtn" type="button" data-hact="cancel" data-sid="' + id + '">Abbrechen</button><button class="smallbtn red" type="button" data-hact="del" data-sid="' + id + '">Löschen</button></div></div>'
         : '<div class="extra" style="margin-top:6px"><span></span><button class="linkbtn danger" type="button" data-hact="ask" data-sid="' + id + '">Training löschen</button></div>';
@@ -500,7 +517,7 @@ $("list").addEventListener("click", (ev) => {
   const act = b.dataset.act, d = day();
   if (act === "reorder") { ui.reorder = true; ui.open = null; ui.editName = null; ui.confirmDel = null; render(); window.scrollTo(0, 0); return; }
   if (act === "add") {
-    const e = { id: newId(), n: "", m: "", kg: "", reps: ["", "", ""], marks: [0, 0, 0], mark: 0 };
+    const e = { id: newId(), n: "", m: "", kg: "", reps: ["", "", ""], sw: ["", "", ""], marks: [0, 0, 0], mark: 0 };
     d.ex.push(e); ui.open = e.id; ui.editName = e.id; touchPlan(d.id); render();
     const f = $("nm-" + e.id); if (f) f.focus();
     return;
@@ -518,7 +535,7 @@ $("list").addEventListener("click", (ev) => {
     const inp = row.querySelector('input[data-f="' + f + '"]'); if (inp) inp.value = f === "kg" ? e.kg : e.reps[+f.slice(1)];
     row.querySelector("[data-vals]").innerHTML = valsHTML(e);
     if (f === "kg") { const sp = row.querySelector('.devs [aria-pressed="true"] span'); if (sp) sp.textContent = e.kg ? e.kg + " kg" : "ohne Gewicht"; }
-    touchPlan(d.id);
+    updSets(row, e); touchPlan(d.id);
   } else if (act === "up" || act === "down") {
     const to = idx + (act === "up" ? -1 : 1); if (to < 0 || to >= d.ex.length) return;
     d.ex.splice(idx, 1); d.ex.splice(to, 0, e); touchPlan(d.id); render();
@@ -528,31 +545,33 @@ $("list").addEventListener("click", (ev) => {
   } else if (act === "dev") {
     loadDev(e, +b.dataset.i); touchPlan(d.id); render();
   } else if (act === "adddev") {
-    if (!e.devs) e.devs = [{ label: "Variante 1", kg: e.kg, reps: e.reps.slice(), marks: e.marks.slice(), step: e.step || 2.5 }];
+    if (!e.devs) e.devs = [{ label: "Variante 1", kg: e.kg, reps: e.reps.slice(), sw: e.sw.slice(), marks: e.marks.slice(), step: e.step || 2.5 }];
     storeDev(e);
-    e.devs.push({ label: "Variante " + (e.devs.length + 1), kg: "", reps: e.reps.map(() => ""), marks: e.reps.map(() => 0), step: e.step || 2.5, mark: 0 });
+    e.devs.push({ label: "Variante " + (e.devs.length + 1), kg: "", reps: e.reps.map(() => ""), sw: e.reps.map(() => ""), marks: e.reps.map(() => 0), step: e.step || 2.5, mark: 0 });
     loadDev(e, e.devs.length - 1); ui.editName = id; touchPlan(d.id); render();
     toast("Variante " + e.devs.length + " angelegt. Gib ihr einen Namen und trag das Gewicht ein.");
   } else if (act === "rmdev") {
     storeDev(e);
     const k = +b.dataset.i, removed = e.devs.splice(k, 1)[0];
     let ai = e.ai || 0; if (ai >= k && ai > 0) ai--; else if (ai === k) ai = 0;
-    e.ai = ai; const cur = e.devs[ai]; normEx(cur); e.kg = cur.kg; e.reps = cur.reps.slice(); e.marks = cur.marks.slice(); e.step = cur.step || 2.5; e.mark = sumMark(e.marks);
+    e.ai = ai; const cur = e.devs[ai]; normEx(cur); normSw(cur); e.kg = cur.kg; e.reps = cur.reps.slice(); e.sw = cur.sw.slice(); e.marks = cur.marks.slice(); e.step = cur.step || 2.5; e.mark = sumMark(e.marks);
     if (e.devs.length < 2) { delete e.devs; delete e.ai; ui.editName = null; }
     touchPlan(d.id); render();
     toast((removed.label || "Variante") + " entfernt");
   } else if (act === "step") {
     e.step = parseFloat(b.dataset.s); touchPlan(d.id); render();
-  } else if (act === "smark") {
-    const j = +b.dataset.j, m = parseInt(b.dataset.m, 10);
-    e.marks[j] = e.marks[j] === m ? 0 : m; e.mark = sumMark(e.marks); touchPlan(d.id); render();
   } else if (act === "addset") {
-    e.reps.push(""); e.marks.push(0); touchPlan(d.id); render();
+    e.reps.push(""); e.sw.push(""); e.marks.push(0); touchPlan(d.id); render();
     const f = $("r" + (e.reps.length - 1) + "-" + id); if (f) f.scrollIntoView({ block: "nearest" });
   } else if (act === "rmset") {
     if (e.reps.length < 2) return;
-    const r = e.reps.pop(), m = e.marks.pop(), ai = e.ai || 0, n = e.reps.length + 1; e.mark = sumMark(e.marks); touchPlan(d.id); render();
-    toast("Satz " + n + " entfernt", () => { if ((e.ai || 0) !== ai || e.reps.length !== n - 1) return; e.reps.push(r); e.marks.push(m); e.mark = sumMark(e.marks); touchPlan(d.id); render(); });
+    const j = +b.dataset.j, ai = e.ai || 0, len = e.reps.length;
+    const r = e.reps.splice(j, 1)[0], w = e.sw.splice(j, 1)[0], m = e.marks.splice(j, 1)[0];
+    touchPlan(d.id); render();
+    toast("Satz " + (j + 1) + " entfernt", () => {
+      if ((e.ai || 0) !== ai || e.reps.length !== len - 1) return;
+      e.reps.splice(j, 0, r); e.sw.splice(j, 0, w); e.marks.splice(j, 0, m); touchPlan(d.id); render();
+    });
   } else if (act === "rename") {
     ui.editName = ui.editName === id ? null : id; render();
     if (ui.editName) { const f = $("nm-" + id); if (f) f.focus(); }
@@ -563,14 +582,25 @@ $("list").addEventListener("click", (ev) => {
     toast(removed.n + " entfernt", () => { d.ex.splice(idx, 0, removed); touchPlan(d.id); render(); });
   }
 });
+function updSets(row, e) {
+  const sm = setMarks(e);
+  row.querySelectorAll(".setrow").forEach((sr) => {
+    const j = +sr.dataset.j, a = sr.querySelector("[data-arr]"), w = sr.querySelector('input[data-f^="w"]');
+    if (a) a.innerHTML = markDot(sm[j], true); if (w) w.placeholder = e.kg || "kg";
+  });
+  const num = row.querySelector(".rowbtn .num"), s = sumMark(sm);
+  if (num) num.innerHTML = s ? markDot(s, true) : String(day().ex.indexOf(e) + 1);
+}
 $("list").addEventListener("input", (ev) => {
   const inp = ev.target, f = inp.dataset.f; if (!f) return;
   const row = inp.closest(".row"), d = day(), e = d.ex.find((x) => x.id === row.dataset.id); if (!e) return;
   const v = inp.value.trim();
   if (f === "kg") e.kg = v; else if (f === "n") e.n = inp.value; else if (f === "m") e.m = inp.value;
   else if (f.startsWith("dl")) { e.devs[+f.slice(2)].label = inp.value; const bt = row.querySelector('.devs [data-i="' + f.slice(2) + '"] b'); if (bt) bt.textContent = inp.value || "Variante " + (+f.slice(2) + 1); }
+  else if (f[0] === "w") e.sw[+f.slice(1)] = v;
   else e.reps[+f.slice(1)] = v;
   row.querySelector("[data-vals]").innerHTML = valsHTML(e);
+  if (f === "kg" || f[0] === "w") updSets(row, e);
   if (f === "kg") { const sp = row.querySelector('.devs [aria-pressed="true"] span'); if (sp) sp.textContent = e.kg ? e.kg + " kg" : "ohne Gewicht"; }
   const names = row.querySelector(".names"); names.children[0].textContent = titleLine(e); names.children[1].textContent = subLine(e);
   touchPlan(d.id);
@@ -637,7 +667,7 @@ $("list").addEventListener("pointercancel", endDrag);
 
 $("saveBtn").onclick = () => {
   const d = day(), id = todayKey() + "_" + d.id, existed = !!sessions[id];
-  sessions[id] = { type: "session", date: todayKey(), day: d.id, title: d.title, ex: clone(d.ex).map((e) => ({ n: e.n, m: e.m, dl: devLabel(e), kg: e.kg, reps: e.reps, marks: e.marks, mark: sumMark(e.marks) })), t: Date.now() };
+  sessions[id] = { type: "session", date: todayKey(), day: d.id, title: d.title, ex: clone(d.ex).map((e) => ({ n: e.n, m: e.m, dl: devLabel(e), kg: e.kg, reps: e.reps, sw: e.sw, marks: setMarks(e), mark: sumMark(setMarks(e)) })), t: Date.now() };
   writeSession(id); ui.open = null; render();
   toast(existed ? d.title + " von heute aktualisiert" : d.title + " gespeichert");
 };
