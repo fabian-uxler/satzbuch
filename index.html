@@ -52,8 +52,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .list .row:first-child{border-top:0}
 .row{border-top:1px solid var(--line);scroll-margin-top:150px}
 .row.open{background:var(--surface)}
-.rowbtn{width:100%;min-height:64px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:12px 16px;border:0;background:transparent;text-align:left;cursor:pointer}
-.num{width:16px;height:22px;display:flex;align-items:center;justify-content:flex-start;font:600 15px var(--display);color:var(--faint);font-variant-numeric:tabular-nums}
+.rowbtn{width:100%;min-height:64px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px;align-items:center;padding:12px 16px;border:0;background:transparent;text-align:left;cursor:pointer}
+.num{width:18px;height:22px;display:flex;align-items:center;justify-content:center;font:600 15px var(--display);color:var(--faint);font-variant-numeric:tabular-nums}
 .num .dot{width:22px;height:22px}
 .num .dot svg{width:14px;height:14px}
 .names{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -118,7 +118,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .panel .pm{width:44px}
 .steps>.srow{flex-wrap:wrap;row-gap:8px}
 .steps>.srow .ctl{margin-left:auto}
-@media (max-width:359px){.swb .num-in{max-width:60px}.panel .ctl{grid-template-columns:40px 60px 40px}.panel .pm{width:40px}}
+@media (max-width:359px){.hsm{display:none}.swb .num-in{max-width:60px}.panel .ctl{grid-template-columns:40px 60px 40px}.panel .pm{width:40px}}
 .seg button{padding:0 9px}
 .xbtn{flex:none;color:var(--fg)}
 .xbtn svg{width:16px;height:16px}
@@ -130,7 +130,19 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .ibtn:active{background:var(--bg)}
 .ibtn[aria-pressed="true"]{background:var(--fg);color:#fff}
 .ibtn.danger{border-color:var(--down);color:var(--down)}
-.addset{height:44px;width:100%}
+.setfoot{display:flex;align-items:center;gap:8px}
+.addset{height:48px;flex:0 1 220px;min-width:0;white-space:nowrap}
+.setfoot .ibtn:first-of-type{margin-left:auto}
+.row.paused .names b,.row.paused .vals{text-decoration:line-through;text-decoration-thickness:2px;color:var(--faint)}
+.row.paused .vals .reps,.row.paused .vals .kg small,.row.paused .rm{color:var(--faint)}
+.dlg{position:fixed;inset:0;z-index:30;background:rgba(23,27,30,.45);display:flex;align-items:flex-end;justify-content:center;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.dlg .box{width:100%;max-width:420px;background:var(--surface);border-radius:16px;padding:20px 16px 16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 12px 40px rgba(23,27,30,.3)}
+.dlg h3{margin:0;font:700 22px var(--display);text-transform:uppercase;letter-spacing:.03em}
+.dlg p{margin:0 0 6px;font-size:14px;color:var(--ink2)}
+.dlg button{height:48px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;border:1.5px solid var(--fg);background:transparent;color:var(--fg)}
+.dlg button.red{background:var(--down);border-color:var(--down);color:#fff}
+.dlg button.redline{border-color:var(--down);color:var(--down)}
+@media (prefers-reduced-motion:no-preference){.dlg .box{animation:dlgup .18s ease-out}@keyframes dlgup{from{transform:translateY(12px);opacity:.4}}}
 .sep{display:inline-block;width:2px;height:.7em;background:var(--faint);margin:0 .26em;vertical-align:.04em;border-radius:1px}
 @media (max-width:359px){.vals.many .kg,.vals.many .reps{font-size:20px}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -401,13 +413,13 @@ function renderHead() {
 const GRIP = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 7.5h10M5 12.5h10" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
 function rowHTML(e, i) {
   if (ui.reorder) {
-    return '<div class="row sortrow" data-id="' + e.id + '"><div class="rowbtn">' +
+    return '<div class="row sortrow' + (e.paused ? " paused" : "") + '" data-id="' + e.id + '"><div class="rowbtn">' +
       '<span class="num">' + (i + 1) + "</span>" +
       '<span class="names"><b>' + esc(titleLine(e)) + "</b><span>" + esc(subLine(e)) + "</span></span>" +
       '<button class="grip" type="button" aria-label="' + esc(e.n || "Übung") + ' verschieben (Pfeiltasten hoch und runter)">' + GRIP + "</button></div></div>";
   }
   const open = ui.open === e.id;
-  let h = '<div class="row' + (open ? " open" : "") + '" data-id="' + e.id + '">' +
+  let h = '<div class="row' + (open ? " open" : "") + (e.paused ? " paused" : "") + '" data-id="' + e.id + '">' +
     '<button class="rowbtn" type="button" data-act="toggle" aria-expanded="' + open + '">' +
     '<span class="num">' + (i + 1) + "</span>" +
     '<span class="names"><b>' + esc(titleLine(e)) + "</b><span>" + esc(subLine(e)) + "</span></span>" +
@@ -442,15 +454,12 @@ function rowHTML(e, i) {
         '<div class="ctl"><button class="pm" type="button" data-act="dec" data-f="r' + j + '" aria-label="Satz ' + n + ' eine Wiederholung weniger">−</button><input class="num-in" id="r' + j + "-" + e.id + '" data-f="r' + j + '" inputmode="numeric" value="' + esc(r) + '" placeholder="–" autocomplete="off" aria-label="Satz ' + n + ' Wiederholungen"><button class="pm" type="button" data-act="inc" data-f="r' + j + '" aria-label="Satz ' + n + ' eine Wiederholung mehr">+</button></div>' +
         '</div>';
     });
-    h += '<button class="smallbtn addset" type="button" data-act="addset">+ Satz hinzufügen</button>';
     h += "</div>";
-    if (ui.confirmDel === e.id) {
-      h += '<div class="confirm"><span>Übung aus ' + esc(day().title) + " entfernen?</span><div>" +
-        '<button class="smallbtn" type="button" data-act="cancelDel">Abbrechen</button><button class="smallbtn red" type="button" data-act="del">Entfernen</button></div></div>';
-    }
-    h += '<div class="donerow"><button class="done" type="button" data-act="toggle">Fertig</button>' +
+    h += '<div class="setfoot"><button class="smallbtn addset" type="button" data-act="addset">+ Satz<span class="hsm"> hinzufügen</span></button>' +
+      '<button class="ibtn" type="button" data-act="pause" aria-pressed="' + !!e.paused + '" aria-label="Übung pausieren"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5v14M15 5v14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>' +
       '<button class="ibtn" type="button" data-act="rename" aria-pressed="' + (ui.editName === e.id) + '" aria-label="Übung bearbeiten"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></button>' +
-      '<button class="ibtn danger" type="button" data-act="askDel" aria-label="Übung löschen"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M10 3h4M6 7l1 13h10l1-13M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></button></div></div>';
+      '<button class="ibtn danger" type="button" data-act="askDel" aria-label="Übung löschen"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M10 3h4M6 7l1 13h10l1-13M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></button>' + '</div>';
+    h += '<button class="done" type="button" data-act="toggle">Fertig</button></div>';
   }
   return h + "</div>";
 }
@@ -518,6 +527,41 @@ $("week").addEventListener("click", (ev) => {
 });
 $("histToggle").onclick = () => { ui.reorder = false; ui.view = ui.view === "hist" ? "plan" : "hist"; render(); window.scrollTo(0, 0); };
 
+function rmDev(d, e, k) {
+  storeDev(e);
+  const removed = e.devs.splice(k, 1)[0];
+  let ai = e.ai || 0; if (ai >= k && ai > 0) ai--; else if (ai === k) ai = 0;
+  e.ai = ai; const cur = e.devs[ai]; normEx(cur); normSw(cur); e.kg = cur.kg; e.reps = cur.reps.slice(); e.sw = cur.sw.slice(); e.marks = cur.marks.slice(); e.step = cur.step || 2.5; e.mark = sumMark(e.marks);
+  if (e.devs.length < 2) { delete e.devs; delete e.ai; ui.editName = null; }
+  touchPlan(d.id); render();
+  toast((removed.label || "Variante") + " entfernt");
+}
+function delEx(d, e) {
+  const idx = d.ex.indexOf(e); if (idx < 0) return;
+  d.ex.splice(idx, 1); ui.open = null; touchPlan(d.id); render();
+  toast((e.n || "Übung") + " entfernt", () => { d.ex.splice(idx, 0, e); touchPlan(d.id); render(); });
+}
+let dlgBack = null;
+function closeDlg() { const o = $("dlg"); if (o) o.remove(); document.removeEventListener("keydown", dlgKey); if (dlgBack) { try { dlgBack.focus({ preventScroll: true }); } catch (x) {} dlgBack = null; } }
+function dlgKey(ev) { if (ev.key === "Escape") closeDlg(); }
+function askDelete(d, e) {
+  dlgBack = document.activeElement;
+  const multi = e.devs && e.devs.length > 1, name = esc(e.n || "Übung"), vl = esc(devLabel(e));
+  const o = document.createElement("div"); o.className = "dlg"; o.id = "dlg";
+  o.innerHTML = '<div class="box" role="alertdialog" aria-modal="true" aria-labelledby="dlgT" aria-describedby="dlgP"><h3 id="dlgT">' + (multi ? "Was löschen?" : "Übung löschen?") + "</h3>" +
+    '<p id="dlgP">' + (multi ? "„" + name + "“ hat mehrere Varianten. Du kannst nur die Variante „" + vl + "“ oder die ganze Übung mit allen Varianten löschen." : "„" + name + "“ wird aus " + esc(d.title) + " entfernt.") + "</p>" +
+    (multi ? '<button type="button" class="redline" data-d="dev">Variante „' + vl + '“ löschen</button><button type="button" class="red" data-d="ex">Ganze Übung löschen</button>'
+      : '<button type="button" class="red" data-d="ex">Löschen</button>') +
+    '<button type="button" data-d="no">Abbrechen</button></div>';
+  o.addEventListener("click", (ev) => {
+    if (ev.target === o) return closeDlg();
+    const bt = ev.target.closest("[data-d]"); if (!bt) return;
+    const w = bt.dataset.d; dlgBack = null; closeDlg();
+    if (w === "dev") rmDev(d, e, e.ai || 0); else if (w === "ex") delEx(d, e);
+  });
+  document.body.appendChild(o); document.addEventListener("keydown", dlgKey);
+  o.querySelector('[data-d="no"]').focus();
+}
 $("list").addEventListener("click", (ev) => {
   const b = ev.target.closest("[data-act]"); if (!b) return;
   const act = b.dataset.act, d = day();
@@ -557,13 +601,7 @@ $("list").addEventListener("click", (ev) => {
     loadDev(e, e.devs.length - 1); ui.editName = id; touchPlan(d.id); render();
     toast("Variante " + e.devs.length + " angelegt. Gib ihr einen Namen und trag das Gewicht ein.");
   } else if (act === "rmdev") {
-    storeDev(e);
-    const k = +b.dataset.i, removed = e.devs.splice(k, 1)[0];
-    let ai = e.ai || 0; if (ai >= k && ai > 0) ai--; else if (ai === k) ai = 0;
-    e.ai = ai; const cur = e.devs[ai]; normEx(cur); normSw(cur); e.kg = cur.kg; e.reps = cur.reps.slice(); e.sw = cur.sw.slice(); e.marks = cur.marks.slice(); e.step = cur.step || 2.5; e.mark = sumMark(e.marks);
-    if (e.devs.length < 2) { delete e.devs; delete e.ai; ui.editName = null; }
-    touchPlan(d.id); render();
-    toast((removed.label || "Variante") + " entfernt");
+    rmDev(d, e, +b.dataset.i);
   } else if (act === "step") {
     e.step = parseFloat(b.dataset.s); touchPlan(d.id); render();
   } else if (act === "addset") {
@@ -581,12 +619,10 @@ $("list").addEventListener("click", (ev) => {
   } else if (act === "rename") {
     ui.editName = ui.editName === id ? null : id; render();
     if (ui.editName) { const f = $("nm-" + id); if (f) f.focus(); }
-  } else if (act === "askDel") { ui.confirmDel = id; render(); }
-  else if (act === "cancelDel") { ui.confirmDel = null; render(); }
-  else if (act === "del") {
-    const [removed] = d.ex.splice(idx, 1); ui.open = null; ui.confirmDel = null; touchPlan(d.id); render();
-    toast(removed.n + " entfernt", () => { d.ex.splice(idx, 0, removed); touchPlan(d.id); render(); });
-  }
+  } else if (act === "pause") {
+    e.paused = !e.paused; if (!e.paused) delete e.paused; touchPlan(d.id); render();
+    toast((e.n || "Übung") + (e.paused ? " pausiert" : " wieder aktiv"));
+  } else if (act === "askDel") { askDelete(d, e); }
 });
 function updSets(row, e) {
   const sm = setMarks(e);
@@ -672,7 +708,7 @@ $("list").addEventListener("pointercancel", endDrag);
 
 $("saveBtn").onclick = () => {
   const d = day(), id = todayKey() + "_" + d.id, existed = !!sessions[id];
-  sessions[id] = { type: "session", date: todayKey(), day: d.id, title: d.title, ex: clone(d.ex).map((e) => ({ n: e.n, m: e.m, dl: devLabel(e), kg: e.kg, reps: e.reps, sw: e.sw, marks: setMarks(e), mark: sumMark(setMarks(e)) })), t: Date.now() };
+  sessions[id] = { type: "session", date: todayKey(), day: d.id, title: d.title, ex: clone(d.ex).filter((e) => !e.paused).map((e) => ({ n: e.n, m: e.m, dl: devLabel(e), kg: e.kg, reps: e.reps, sw: e.sw, marks: setMarks(e), mark: sumMark(setMarks(e)) })), t: Date.now() };
   writeSession(id); ui.open = null; render();
   toast(existed ? d.title + " von heute aktualisiert" : d.title + " gespeichert");
 };
