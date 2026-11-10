@@ -50,7 +50,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .dot svg{width:12px;height:12px}
 .list{border-bottom:1px solid var(--line)}
 .list .row:first-child{border-top:0}
-.row{border-top:1px solid var(--line);scroll-margin-top:150px}
+.row{border-top:1px solid var(--line);scroll-margin-top:215px}
 .row.open{background:var(--surface)}
 .rowbtn{width:100%;min-height:64px;display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 16px;border:0;background:transparent;text-align:left;cursor:pointer}
 .num{width:22px;height:22px;display:flex;align-items:center;justify-content:center;font:600 15px var(--display);color:var(--faint);font-variant-numeric:tabular-nums}
@@ -156,6 +156,23 @@ body.sorting{user-select:none;-webkit-user-select:none}
 .backup p{margin:0;font-size:13px;color:var(--muted);max-width:60ch}
 .bbtns{display:flex;gap:8px;flex-wrap:wrap}
 .filebtn{display:inline-flex;align-items:center}
+/* week */
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.week button{height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg);cursor:pointer;padding:0;min-width:0;font-variant-numeric:tabular-nums}
+.week button b{font:700 15px var(--display);letter-spacing:.04em;text-transform:uppercase;line-height:1}
+.week button span{font-size:11.5px;letter-spacing:-.02em;color:var(--muted);line-height:1.2}
+.week button.today{border:2px solid var(--fg)}
+.week button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.week button.on span{color:var(--accent-ink)}
+.week button.on.today{box-shadow:inset 0 0 0 2px var(--surface)}
+.sheetbg{position:fixed;inset:0;z-index:30;background:rgba(23,27,30,.38);display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:560px;background:var(--surface);border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.sheet h3{margin:0;font:700 22px var(--display);text-transform:uppercase;letter-spacing:.03em}
+.sheet p{margin:0;font-size:13px;color:var(--muted)}
+.picks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.picks button{height:56px;border:1px solid var(--field);border-radius:10px;background:var(--surface);font:700 18px var(--display);letter-spacing:.04em;text-transform:uppercase;color:var(--fg);cursor:pointer}
+.picks button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:sheetup .18s ease-out}@keyframes sheetup{from{transform:translateY(24px);opacity:.5}}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:#fff;border-radius:12px;padding:10px 14px;display:flex;gap:14px;align-items:center;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
 .toast button{background:transparent;border:0;color:#fff;font-weight:700;text-decoration:underline;cursor:pointer;padding:4px}
 @media (prefers-reduced-motion:no-preference){.toast{animation:up .18s ease-out}@keyframes up{from{transform:translate(-50%,8px);opacity:.4}}}
@@ -168,6 +185,7 @@ body.sorting{user-select:none;-webkit-user-select:none}
       <h1>Satzbuch</h1>
       <div class="meta"><span id="today"></span><button class="linkbtn" id="histToggle" type="button">Verlauf</button></div>
     </div>
+    <div class="week" id="week" role="group" aria-label="Diese Woche"></div>
     <div class="tabs" role="tablist" id="tabs" aria-label="Trainingstag"></div>
   </div>
 
@@ -193,6 +211,7 @@ body.sorting{user-select:none;-webkit-user-select:none}
     </div>
   </div>
 </div>
+<div class="sheetbg" id="sheetBg" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><h3 id="sheetTitle"></h3><p id="sheetHint"></p><div class="picks" id="picks"></div><button class="smallbtn" type="button" id="sheetClose">Schließen</button></div></div>
 <div class="toast" id="toast" hidden><span id="toastMsg"></span><button id="toastBtn" type="button" hidden>Rückgängig</button></div>
 
 <script>
@@ -212,6 +231,7 @@ const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2
 /* ---------- state ---------- */
 let plan = {};            // dayId -> {id,title,sub,ex:[...],t}
 let sessions = {};        // docId -> {date,day,title,ex,t}
+let week = {};            // "YYYY-MM-DD" -> dayId (Wochenübersicht: welches Training an welchem Tag)
 let ui = { reorder: false, day: "TorsoA", open: null, view: "plan", editName: null, confirmDel: null, histOpen: null, histDel: null };
 let db = null;
 let mig = 0;
@@ -223,6 +243,7 @@ function lsLoad() {
     if (o) {
       if (o.plan) for (const k in o.plan) if (plan[k] && o.plan[k].t >= plan[k].t) plan[k] = o.plan[k];
       if (o.sessions) sessions = o.sessions;
+      if (o.week && typeof o.week === "object") week = o.week;
       if (o.day && plan[o.day]) ui.day = o.day;
       mig = o.mig || 0;
     }
@@ -238,7 +259,7 @@ function lsLoad() {
     mig = 1; lsSave();
   }
 }
-function lsSave() { try { localStorage.setItem(LS, JSON.stringify({ plan, sessions, day: ui.day, mig })); } catch (e) {} }
+function lsSave() { try { localStorage.setItem(LS, JSON.stringify({ plan, sessions, day: ui.day, mig, week })); } catch (e) {} }
 
 /* ---------- persistence ---------- */
 const timers = {};
@@ -305,6 +326,34 @@ function lastSaved(dayId) {
   let best = null;
   for (const k in sessions) { const s = sessions[k]; if (s.day === dayId && (!best || s.date > best.date)) best = s; }
   return best;
+}
+const WD = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+const dkey = (d) => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+function weekDays() {
+  const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return WD.map((w, i) => { const x = new Date(d); x.setDate(d.getDate() + i); return { w, k: dkey(x), lbl: pad(x.getDate()) + "." + pad(x.getMonth() + 1) + "." }; });
+}
+const dayTitle = (id) => (plan[id] && plan[id].title) || id;
+function renderWeek() {
+  const t = todayKey();
+  $("week").innerHTML = weekDays().map((x) => {
+    const tr = week[x.k];
+    return '<button type="button" data-wk="' + x.k + '" class="' + (x.k === t ? "today" : "") + (tr ? " on" : "") + '" aria-haspopup="dialog" aria-label="' +
+      dlabel(x.k, { weekday: "long", day: "numeric", month: "long" }) + (tr ? ", " + esc(dayTitle(tr)) : ", kein Training") + '"><b>' + x.w + "</b><span>" + x.lbl + "</span></button>";
+  }).join("");
+}
+let sheetKey = null;
+function openSheet(k) {
+  sheetKey = k;
+  $("sheetTitle").textContent = dlabel(k, { weekday: "long", day: "numeric", month: "long" });
+  $("sheetHint").textContent = week[k] ? "Tippe das markierte Training erneut, um die Markierung zu entfernen." : "Welches Training hast du an diesem Tag gemacht?";
+  $("picks").innerHTML = DEFAULT_PLAN.map((d) => '<button type="button" data-pick="' + d.id + '" aria-pressed="' + (week[k] === d.id) + '">' + esc(dayTitle(d.id)) + "</button>").join("");
+  $("sheetBg").hidden = false;
+  const f = $("picks").querySelector('[aria-pressed="true"]') || $("picks").querySelector("button"); if (f) f.focus({ preventScroll: true });
+}
+function closeSheet() {
+  const k = sheetKey; sheetKey = null; $("sheetBg").hidden = true;
+  const b = k && $("week").querySelector('[data-wk="' + k + '"]'); if (b) b.focus({ preventScroll: true });
 }
 function renderHead() {
   $("histCount").textContent = Object.keys(sessions).length + " gespeicherte Trainings";
@@ -399,7 +448,7 @@ function render() {
   $("histToggle").textContent = ui.view === "hist" ? "Zurück" : "Verlauf";
   $("viewPlan").hidden = ui.view !== "plan";
   $("viewHist").hidden = ui.view !== "hist";
-  renderTabs(); renderHead();
+  renderWeek(); renderTabs(); renderHead();
   if (ui.view === "plan") { renderList(); renderStatus(); } else renderHist();
 }
 let deferred = false;
@@ -418,6 +467,17 @@ $("tabs").addEventListener("click", (ev) => {
   const b = ev.target.closest("[data-day]"); if (!b) return;
   ui.day = b.dataset.day; ui.open = null; ui.view = "plan"; ui.editName = null; ui.confirmDel = null; lsSave(); render(); window.scrollTo(0, 0);
 });
+$("week").addEventListener("click", (ev) => { const b = ev.target.closest("[data-wk]"); if (b) openSheet(b.dataset.wk); });
+$("picks").addEventListener("click", (ev) => {
+  const b = ev.target.closest("[data-pick]"); if (!b || !sheetKey) return;
+  const k = sheetKey, id = b.dataset.pick, lbl = dlabel(k, { weekday: "short", day: "2-digit", month: "2-digit" });
+  if (week[k] === id) { delete week[k]; toast("Markierung für " + lbl + " entfernt"); }
+  else { week[k] = id; toast(dayTitle(id) + " am " + lbl + " eingetragen"); }
+  lsSave(); renderWeek(); closeSheet();
+});
+$("sheetClose").onclick = closeSheet;
+$("sheetBg").addEventListener("click", (ev) => { if (ev.target === $("sheetBg")) closeSheet(); });
+document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && !$("sheetBg").hidden) closeSheet(); });
 $("histToggle").onclick = () => { ui.reorder = false; ui.view = ui.view === "hist" ? "plan" : "hist"; render(); window.scrollTo(0, 0); };
 
 $("list").addEventListener("click", (ev) => {
@@ -435,7 +495,7 @@ $("list").addEventListener("click", (ev) => {
   if (act === "toggle") {
     const opening = ui.open !== id;
     ui.open = opening ? id : null; ui.editName = null; ui.confirmDel = null; render();
-    if (opening) { const r = document.querySelector('.row[data-id="' + id + '"]'); if (r && r.getBoundingClientRect().top < 160) r.scrollIntoView({ block: "start" }); }
+    if (opening) { const r = document.querySelector('.row[data-id="' + id + '"]'); if (r && r.getBoundingClientRect().top < 225) r.scrollIntoView({ block: "start" }); }
   } else if (act === "inc" || act === "dec") {
     const f = b.dataset.f, sign = act === "inc" ? 1 : -1;
     if (f === "kg") e.kg = stepKg(e.kg, sign * (e.step || 2.5));
@@ -448,7 +508,7 @@ $("list").addEventListener("click", (ev) => {
     const to = idx + (act === "up" ? -1 : 1); if (to < 0 || to >= d.ex.length) return;
     d.ex.splice(idx, 1); d.ex.splice(to, 0, e); touchPlan(d.id); render();
     const r = document.querySelector('.row[data-id="' + id + '"]'), btn = r && r.querySelector('[data-act="' + act + '"]');
-    if (r) { const top = r.getBoundingClientRect().top; if (top < 150 || top > window.innerHeight - 200) r.scrollIntoView({ block: "start" }); }
+    if (r) { const top = r.getBoundingClientRect().top; if (top < 215 || top > window.innerHeight - 200) r.scrollIntoView({ block: "start" }); }
     if (btn && !btn.disabled) btn.focus();
   } else if (act === "dev") {
     loadDev(e, +b.dataset.i); touchPlan(d.id); render();
@@ -516,7 +576,7 @@ $("list").addEventListener("pointerdown", (ev) => {
   row.classList.add("dragging"); document.body.classList.add("sorting");
   const loop = () => {
     if (!drag) return;
-    const edgeTop = 150, edgeBot = window.innerHeight - 70;
+    const edgeTop = 215, edgeBot = window.innerHeight - 70;
     if (drag.y < edgeTop) window.scrollBy(0, -Math.ceil((edgeTop - drag.y) / 6));
     else if (drag.y > edgeBot) window.scrollBy(0, Math.ceil((drag.y - edgeBot) / 6));
     place();
@@ -574,7 +634,7 @@ $("histList").addEventListener("click", (ev) => {
 
 /* ---------- backup ---------- */
 $("exportBtn").onclick = () => {
-  const data = JSON.stringify({ app: "satzbuch", v: 2, exported: new Date().toISOString(), plan, sessions }, null, 1);
+  const data = JSON.stringify({ app: "satzbuch", v: 2, exported: new Date().toISOString(), plan, sessions, week }, null, 1);
   const url = URL.createObjectURL(new Blob([data], { type: "application/json" }));
   const a = document.createElement("a"); a.href = url; a.download = "satzbuch-" + todayKey() + ".json";
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
@@ -595,7 +655,7 @@ $("importCancel").onclick = () => { pendingImport = null; $("importConfirm").hid
 $("importOk").onclick = () => {
   if (!pendingImport) return;
   for (const k in pendingImport.plan) if (plan[k]) plan[k] = pendingImport.plan[k];
-  sessions = pendingImport.sessions || {}; pendingImport = null; $("importConfirm").hidden = true;
+  sessions = pendingImport.sessions || {}; week = pendingImport.week || {}; pendingImport = null; $("importConfirm").hidden = true;
   lsSave(); render(); toast("Sicherung geladen");
 };
 
