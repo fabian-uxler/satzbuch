@@ -1,5 +1,5 @@
 // Satzbuch offline cache. Bump VERSION when files change.
-const VERSION = "satzbuch-v32";
+const VERSION = "satzbuch-v33";
 const CORE = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "icon-180.png"];
 const FONTS = "satzbuch-fonts";
 
@@ -20,6 +20,11 @@ self.addEventListener("fetch", (e) => {
     return;
   }
   if (url.origin !== self.location.origin) return;
+  // Manifest immer frisch vom Server holen (Installierbarkeit, App-ID), Cache nur offline
+  if (url.pathname.endsWith("manifest.webmanifest")) {
+    e.respondWith(fetch(req, { cache: "no-cache" }).then((res) => { if (res.ok) caches.open(VERSION).then((c) => c.put(req, res.clone())); return res; }).catch(() => caches.match(req, { ignoreSearch: true })));
+    return;
+  }
   // App files: answer from cache instantly, refresh the cache in the background
   e.respondWith(caches.open(VERSION).then((c) => c.match(req, { ignoreSearch: true }).then((hit) => {
     const net = fetch(req).then((res) => { if (res.ok) c.put(req, res.clone()); return res; }).catch(() => hit || c.match("index.html"));
